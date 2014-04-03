@@ -1,0 +1,69 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'Review' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="review_customerCode" class="col-sm-2 control-label">{{ 'review.customerCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="review_customerCode" ng-model="review.customerCode" name="customerCode" class="form-control" ng-disabled="mode != 'create'">
+						<option value=""></option>
+                        <option ng-repeat="customer in items.customers" title="{{customer.label}}" ng-selected="{{customer.value == review.customerCode}}" value="{{customer.value}}">{{customer.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="review_bookId" class="col-sm-2 control-label">{{ 'review.bookId' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="review_bookId" ng-model="review.bookId" name="bookId" class="form-control" ng-disabled="mode != 'create'">
+						<option value=""></option>
+                        <option ng-repeat="book in items.books" title="{{book.label}}" ng-selected="{{book.value == review.bookId}}" value="{{book.value}}">{{book.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="review_reviewText" class="col-sm-2 control-label">{{ 'review.reviewText' | translate }}</label>
+				<div class="col-sm-10">
+					<textarea id="review_reviewText" name="reviewText" ng-model="review.reviewText" class="form-control" ></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="review_reviewNote" class="col-sm-2 control-label">{{ 'review.reviewNote' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="review_reviewNote" name="reviewNote" ng-model="review.reviewNote" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="review_creation" class="col-sm-2 control-label">{{ 'review.creation' | translate }}</label>
+				<div class="col-sm-10">
+					<input id="review_creation" bs-datepicker data-autoclose="1" ng-model="review.creation" name="creation" class="form-control" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="review_lastUpdate" class="col-sm-2 control-label">{{ 'review.lastUpdate' | translate }}</label>
+				<div class="col-sm-10">
+					<input id="review_lastUpdate" bs-datepicker data-autoclose="1" ng-model="review.lastUpdate" name="lastUpdate" class="form-control" />
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(review.customerCode, review.bookId)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/review">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

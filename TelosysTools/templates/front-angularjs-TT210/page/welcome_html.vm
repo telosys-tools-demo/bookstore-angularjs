@@ -1,0 +1,11 @@
+#set( $_ = "$" )
+
+	<h3>
+		{{ 'welcome' | translate }}
+	</h3>
+      
+	<ul class="entity">
+#foreach( $entity in $selectedEntities )
+        <li><a href="#/${fn.uncapitalize($entity.name)}">{{ '${entity.name}' | translate }}</a></li>
+#end
+    </ul>

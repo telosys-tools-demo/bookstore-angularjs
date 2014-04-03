@@ -1,0 +1,93 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'Book' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="book_id" class="col-sm-2 control-label">{{ 'book.id' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_id" name="id" ng-model="book.id" class="form-control" maxLength="11"  ng-disabled="mode != 'create'"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_publisherId" class="col-sm-2 control-label">{{ 'book.publisherId' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="book_publisherId" ng-model="book.publisherId" name="publisherId" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="publisher in items.publishers" title="{{publisher.label}}" ng-selected="{{publisher.value == book.publisherId}}" value="{{publisher.value}}">{{publisher.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_authorId" class="col-sm-2 control-label">{{ 'book.authorId' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="book_authorId" ng-model="book.authorId" name="authorId" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="author in items.authors" title="{{author.label}}" ng-selected="{{author.value == book.authorId}}" value="{{author.value}}">{{author.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_isbn" class="col-sm-2 control-label">{{ 'book.isbn' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_isbn" name="isbn" ng-model="book.isbn" class="form-control" maxLength="13" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_title" class="col-sm-2 control-label">{{ 'book.title' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_title" name="title" ng-model="book.title" class="form-control" maxLength="160" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_price" class="col-sm-2 control-label">{{ 'book.price' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_price" name="price" ng-model="book.price" class="form-control" maxLength="20" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_quantity" class="col-sm-2 control-label">{{ 'book.quantity' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_quantity" name="quantity" ng-model="book.quantity" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_discount" class="col-sm-2 control-label">{{ 'book.discount' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_discount" name="discount" ng-model="book.discount" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_availability" class="col-sm-2 control-label">{{ 'book.availability' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_availability" name="availability" ng-model="book.availability" class="form-control" maxLength="6" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="book_bestSeller" class="col-sm-2 control-label">{{ 'book.bestSeller' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="book_bestSeller" name="bestSeller" ng-model="book.bestSeller" class="form-control" maxLength="6" />
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(book.id)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/book">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

@@ -1,0 +1,27 @@
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ 'EmployeeGroup' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'employeeGroup.employeeCode' | translate }}</th>
+						<th>{{ 'employeeGroup.groupId' | translate }}</th>
+						<th><a class="btn btn-info" href='#/employeeGroup/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="employeeGroup in employeeGroups.list">
+						<td>{{employeeGroup.employeeCode}}</td>
+						<td>{{employeeGroup.groupId}}</td>
+						<td><a class="btn btn-info" href="#/employeeGroup/{{employeeGroup.employeeCode}}/{{employeeGroup.groupId}}">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

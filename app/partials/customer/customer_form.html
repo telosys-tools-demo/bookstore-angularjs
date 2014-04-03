@@ -1,0 +1,96 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'Customer' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="customer_code" class="col-sm-2 control-label">{{ 'customer.code' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_code" name="code" ng-model="customer.code" class="form-control" maxLength="5"  ng-disabled="mode != 'create'"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_countryCode" class="col-sm-2 control-label">{{ 'customer.countryCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="customer_countryCode" ng-model="customer.countryCode" name="countryCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="country in items.countrys" title="{{country.label}}" ng-selected="{{country.value == customer.countryCode}}" value="{{country.value}}">{{country.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_firstName" class="col-sm-2 control-label">{{ 'customer.firstName' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_firstName" name="firstName" ng-model="customer.firstName" class="form-control" maxLength="40" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_lastName" class="col-sm-2 control-label">{{ 'customer.lastName' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_lastName" name="lastName" ng-model="customer.lastName" class="form-control" maxLength="40" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_login" class="col-sm-2 control-label">{{ 'customer.login' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_login" name="login" ng-model="customer.login" class="form-control" maxLength="20" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_password" class="col-sm-2 control-label">{{ 'customer.password' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_password" name="password" ng-model="customer.password" class="form-control" maxLength="20" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_age" class="col-sm-2 control-label">{{ 'customer.age' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_age" name="age" ng-model="customer.age" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_city" class="col-sm-2 control-label">{{ 'customer.city' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_city" name="city" ng-model="customer.city" class="form-control" maxLength="45" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_zipCode" class="col-sm-2 control-label">{{ 'customer.zipCode' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_zipCode" name="zipCode" ng-model="customer.zipCode" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_phone" class="col-sm-2 control-label">{{ 'customer.phone' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_phone" name="phone" ng-model="customer.phone" class="form-control" maxLength="20" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="customer_reviewer" class="col-sm-2 control-label">{{ 'customer.reviewer' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="customer_reviewer" name="reviewer" ng-model="customer.reviewer" class="form-control" maxLength="6" />
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(customer.code)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/customer">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

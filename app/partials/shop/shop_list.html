@@ -1,0 +1,39 @@
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ 'Shop' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'shop.code' | translate }}</th>
+						<th>{{ 'shop.name' | translate }}</th>
+						<th>{{ 'shop.address1' | translate }}</th>
+						<th>{{ 'shop.address2' | translate }}</th>
+						<th>{{ 'shop.zipCode' | translate }}</th>
+						<th>{{ 'shop.city' | translate }}</th>
+						<th>{{ 'shop.phone' | translate }}</th>
+						<th>{{ 'shop.email' | translate }}</th>
+						<th><a class="btn btn-info" href='#/shop/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="shop in shops.list">
+						<td>{{shop.code}}</td>
+						<td>{{shop.name}}</td>
+						<td>{{shop.address1}}</td>
+						<td>{{shop.address2}}</td>
+						<td>{{shop.zipCode | number }}</td>
+						<td>{{shop.city}}</td>
+						<td>{{shop.phone}}</td>
+						<td>{{shop.email}}</td>
+						<td><a class="btn btn-info" href="#/shop/{{shop.code}}">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

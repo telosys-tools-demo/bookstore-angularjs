@@ -1,0 +1,27 @@
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ 'Country' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'country.code' | translate }}</th>
+						<th>{{ 'country.name' | translate }}</th>
+						<th><a class="btn btn-info" href='#/country/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="country in countrys.list">
+						<td>{{country.code}}</td>
+						<td>{{country.name}}</td>
+						<td><a class="btn btn-info" href="#/country/{{country.code}}">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

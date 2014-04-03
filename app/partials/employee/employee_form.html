@@ -1,0 +1,75 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'Employee' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="employee_code" class="col-sm-2 control-label">{{ 'employee.code' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="employee_code" name="code" ng-model="employee.code" class="form-control" maxLength="4"  ng-disabled="mode != 'create'"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="employee_shopCode" class="col-sm-2 control-label">{{ 'employee.shopCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="employee_shopCode" ng-model="employee.shopCode" name="shopCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="shop in items.shops" title="{{shop.label}}" ng-selected="{{shop.value == employee.shopCode}}" value="{{shop.value}}">{{shop.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="employee_firstName" class="col-sm-2 control-label">{{ 'employee.firstName' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="employee_firstName" name="firstName" ng-model="employee.firstName" class="form-control" maxLength="40" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="employee_lastName" class="col-sm-2 control-label">{{ 'employee.lastName' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="employee_lastName" name="lastName" ng-model="employee.lastName" class="form-control" maxLength="40" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="employee_manager" class="col-sm-2 control-label">{{ 'employee.manager' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="employee_manager" name="manager" ng-model="employee.manager" class="form-control" maxLength="6" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="employee_badgeNumber" class="col-sm-2 control-label">{{ 'employee.badgeNumber' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="employee_badgeNumber" ng-model="employee.badgeNumber" name="badgeNumber" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="badge in items.badges" title="{{badge.label}}" ng-selected="{{badge.value == employee.badgeNumber}}" value="{{badge.value}}">{{badge.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="employee_email" class="col-sm-2 control-label">{{ 'employee.email' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="employee_email" name="email" ng-model="employee.email" class="form-control" maxLength="60" />
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(employee.code)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/employee">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

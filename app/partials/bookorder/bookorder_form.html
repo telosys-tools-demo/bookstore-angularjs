@@ -1,0 +1,72 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'BookOrder' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="bookOrder_id" class="col-sm-2 control-label">{{ 'bookOrder.id' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="bookOrder_id" name="id" ng-model="bookOrder.id" class="form-control" maxLength="11"  ng-disabled="mode != 'create'"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="bookOrder_shopCode" class="col-sm-2 control-label">{{ 'bookOrder.shopCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="bookOrder_shopCode" ng-model="bookOrder.shopCode" name="shopCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="shop in items.shops" title="{{shop.label}}" ng-selected="{{shop.value == bookOrder.shopCode}}" value="{{shop.value}}">{{shop.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="bookOrder_customerCode" class="col-sm-2 control-label">{{ 'bookOrder.customerCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="bookOrder_customerCode" ng-model="bookOrder.customerCode" name="customerCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="customer in items.customers" title="{{customer.label}}" ng-selected="{{customer.value == bookOrder.customerCode}}" value="{{customer.value}}">{{customer.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="bookOrder_employeeCode" class="col-sm-2 control-label">{{ 'bookOrder.employeeCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="bookOrder_employeeCode" ng-model="bookOrder.employeeCode" name="employeeCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="employee in items.employees" title="{{employee.label}}" ng-selected="{{employee.value == bookOrder.employeeCode}}" value="{{employee.value}}">{{employee.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="bookOrder_date" class="col-sm-2 control-label">{{ 'bookOrder.date' | translate }}</label>
+				<div class="col-sm-10">
+					<input id="bookOrder_date" bs-datepicker data-autoclose="1" ng-model="bookOrder.date" name="date" class="form-control" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="bookOrder_state" class="col-sm-2 control-label">{{ 'bookOrder.state' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="bookOrder_state" name="state" ng-model="bookOrder.state" class="form-control" maxLength="11" />
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(bookOrder.id)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/bookOrder">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

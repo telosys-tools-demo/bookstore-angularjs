@@ -1,0 +1,27 @@
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ 'Synopsis' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'synopsis.bookId' | translate }}</th>
+						<th>{{ 'synopsis.synopsis' | translate }}</th>
+						<th><a class="btn btn-info" href='#/synopsis/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="synopsis in synopsiss.list">
+						<td>{{synopsis.bookId}}</td>
+						<td>{{synopsis.synopsis}}</td>
+						<td><a class="btn btn-info" href="#/synopsis/{{synopsis.bookId}}">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

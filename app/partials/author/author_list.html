@@ -1,0 +1,29 @@
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ 'Author' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'author.id' | translate }}</th>
+						<th>{{ 'author.firstName' | translate }}</th>
+						<th>{{ 'author.lastName' | translate }}</th>
+						<th><a class="btn btn-info" href='#/author/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="author in authors.list">
+						<td>{{author.id}}</td>
+						<td>{{author.firstName}}</td>
+						<td>{{author.lastName}}</td>
+						<td><a class="btn btn-info" href="#/author/{{author.id}}">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

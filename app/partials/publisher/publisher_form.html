@@ -1,0 +1,78 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'Publisher' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="publisher_code" class="col-sm-2 control-label">{{ 'publisher.code' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_code" name="code" ng-model="publisher.code" class="form-control" maxLength="11"  ng-disabled="mode != 'create'"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_countryCode" class="col-sm-2 control-label">{{ 'publisher.countryCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="publisher_countryCode" ng-model="publisher.countryCode" name="countryCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="country in items.countrys" title="{{country.label}}" ng-selected="{{country.value == publisher.countryCode}}" value="{{country.value}}">{{country.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_name" class="col-sm-2 control-label">{{ 'publisher.name' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_name" name="name" ng-model="publisher.name" class="form-control" maxLength="45" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_email" class="col-sm-2 control-label">{{ 'publisher.email' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_email" name="email" ng-model="publisher.email" class="form-control" maxLength="45" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_contact" class="col-sm-2 control-label">{{ 'publisher.contact' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_contact" name="contact" ng-model="publisher.contact" class="form-control" maxLength="45" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_city" class="col-sm-2 control-label">{{ 'publisher.city' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_city" name="city" ng-model="publisher.city" class="form-control" maxLength="45" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_zipCode" class="col-sm-2 control-label">{{ 'publisher.zipCode' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_zipCode" name="zipCode" ng-model="publisher.zipCode" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="publisher_phone" class="col-sm-2 control-label">{{ 'publisher.phone' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="publisher_phone" name="phone" ng-model="publisher.phone" class="form-control" maxLength="14" />
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(publisher.code)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/publisher">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

@@ -1,0 +1,37 @@
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ 'Publisher' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>{{ 'publisher.code' | translate }}</th>
+						<th>{{ 'publisher.name' | translate }}</th>
+						<th>{{ 'publisher.email' | translate }}</th>
+						<th>{{ 'publisher.contact' | translate }}</th>
+						<th>{{ 'publisher.city' | translate }}</th>
+						<th>{{ 'publisher.zipCode' | translate }}</th>
+						<th>{{ 'publisher.phone' | translate }}</th>
+						<th><a class="btn btn-info" href='#/publisher/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="publisher in publishers.list">
+						<td>{{publisher.code}}</td>
+						<td>{{publisher.name}}</td>
+						<td>{{publisher.email}}</td>
+						<td>{{publisher.contact}}</td>
+						<td>{{publisher.city}}</td>
+						<td>{{publisher.zipCode | number }}</td>
+						<td>{{publisher.phone}}</td>
+						<td><a class="btn btn-info" href="#/publisher/{{publisher.code}}">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

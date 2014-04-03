@@ -1,0 +1,73 @@
+#set( $uncapitalizedEntityName = $fn.uncapitalize($entity.name) )
+#set( $_= "$" )
+##--------------------------------------------------------------------------------------------------------
+##--------------------------------------------------------------------------------------------------------
+## Key fields = fields in Primary Key    
+#set( $keyFields = $entity.keyAttributes )
+##--------------------------------------------------------------------------------------------------------
+## Data fields = fields not in Primary Key    
+#set( $dataFields = $entity.nonKeyAttributes )
+##--------------------------------------------------------------------------------------------------------
+## All fields ( ordered fiels : 1) fields in Primary Key 2) fields not in primary key    
+#set( $allFields = $fn.concatLists($keyFields, $dataFields) )
+##--------------------------------------------------------------------------------------------------------
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ '${entity.name}' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+#foreach( $field in $allFields )
+#set($htmlId      = "${uncapitalizedEntityName}_${field.name}" )
+#set($htmlName    = $field.name )
+#set($fields = [])
+#set($ttt = $fields.add($field))
+#set($referencedEntityTypes = $entity.referencedEntityTypes($fields) )
+#set($ng_disabled = "")
+#if( $field.isKeyElement() )
+#set($ng_disabled = " ng-disabled=""mode != 'create'""")
+#end
+			<div class="form-group">
+				<label for="${htmlId}" class="col-sm-2 control-label">{{ '${fn.uncapitalize($entity.name)}.${field.formattedName(0)}' | translate }}</label>
+				<div class="col-sm-10">
+## ------------------------------------------------ KEY ELEMENT 
+#if( $referencedEntityTypes.size() == 0 )
+#if( $field.fullType == "java.util.Date" || $field.fullType == "java.sql.Date" || $field.fullType == "java.util.Calendar" )
+					<input id="${htmlId}" bs-datepicker data-autoclose="1" ng-model="${fn.uncapitalize($entity.name)}.${htmlName}" name="${htmlName}" class="form-control" $ng_disabled/>
+#elseif( $field.isLongText() )
+					<textarea id="${htmlId}" name="${htmlName}" ng-model="${fn.uncapitalize($entity.name)}.${htmlName}" class="form-control" $ng_disabled></textarea>
+#else
+					<input type="text" id="${htmlId}" name="${htmlName}" ng-model="${fn.uncapitalize($entity.name)}.${htmlName}" class="form-control" maxLength="${field.guiMaxLength}" $ng_disabled/>
+#end
+#end
+#if( $referencedEntityTypes.size() > 0 )
+#set( $ref = ${fn.uncapitalize($referencedEntityTypes.get(0))} )
+                    <select id="${htmlId}" ng-model="${fn.uncapitalize($entity.name)}.${htmlName}" name="${htmlName}" class="form-control"$ng_disabled>
+						<option value=""></option>
+                        <option ng-repeat="${ref} in items.${ref}s" title="{{${ref}.label}}" ng-selected="{{${ref}.value == ${fn.uncapitalize($entity.name)}.${htmlName}}}" value="{{${ref}.value}}">{{${ref}.label}}</option>
+                    </select>
+#end
+				</div>
+			</div>
+#end
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(${entity.keyAttributesNamesAsString(", ", "${uncapitalizedEntityName}.", '')})" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/${uncapitalizedEntityName}">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

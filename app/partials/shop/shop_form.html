@@ -1,0 +1,93 @@
+	<fieldset class="col-sm-12 bordure">
+		<legend class="legende">{{ 'Shop' | translate }}</legend>
+		
+		<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       		{{ success | translate }}
+		</div>
+		<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       		{{error}}
+		</div>
+   		
+		<form class="well form-horizontal">
+			<div class="form-group">
+				<label for="shop_code" class="col-sm-2 control-label">{{ 'shop.code' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_code" name="code" ng-model="shop.code" class="form-control" maxLength="3"  ng-disabled="mode != 'create'"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_name" class="col-sm-2 control-label">{{ 'shop.name' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_name" name="name" ng-model="shop.name" class="form-control" maxLength="80" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_address1" class="col-sm-2 control-label">{{ 'shop.address1' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_address1" name="address1" ng-model="shop.address1" class="form-control" maxLength="80" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_address2" class="col-sm-2 control-label">{{ 'shop.address2' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_address2" name="address2" ng-model="shop.address2" class="form-control" maxLength="80" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_zipCode" class="col-sm-2 control-label">{{ 'shop.zipCode' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_zipCode" name="zipCode" ng-model="shop.zipCode" class="form-control" maxLength="11" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_city" class="col-sm-2 control-label">{{ 'shop.city' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_city" name="city" ng-model="shop.city" class="form-control" maxLength="45" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_countryCode" class="col-sm-2 control-label">{{ 'shop.countryCode' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="shop_countryCode" ng-model="shop.countryCode" name="countryCode" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="country in items.countrys" title="{{country.label}}" ng-selected="{{country.value == shop.countryCode}}" value="{{country.value}}">{{country.label}}</option>
+                    </select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_phone" class="col-sm-2 control-label">{{ 'shop.phone' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_phone" name="phone" ng-model="shop.phone" class="form-control" maxLength="14" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_email" class="col-sm-2 control-label">{{ 'shop.email' | translate }}</label>
+				<div class="col-sm-10">
+					<input type="text" id="shop_email" name="email" ng-model="shop.email" class="form-control" maxLength="50" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="shop_executive" class="col-sm-2 control-label">{{ 'shop.executive' | translate }}</label>
+				<div class="col-sm-10">
+                    <select id="shop_executive" ng-model="shop.executive" name="executive" class="form-control">
+						<option value=""></option>
+                        <option ng-repeat="employee in items.employees" title="{{employee.label}}" ng-selected="{{employee.value == shop.executive}}" value="{{employee.value}}">{{employee.label}}</option>
+                    </select>
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS -->
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-2">
+					<a role="button" class="btn btn-danger btn-block" ng-click="delete(shop.code)" ng-show="mode != 'create'">{{ 'delete' | translate }}</a>
+				</div>
+    			<div class="col-sm-offset-4 col-sm-2">
+					<a role="button" class="btn btn-default btn-block" href="#/shop">{{ 'cancel' | translate }}</a>
+				</div>
+    			<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="save()">{{ 'save' | translate }}</button>
+				</div>
+			</div>
+		</form>
+			
+    </fieldset>

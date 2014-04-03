@@ -1,0 +1,15 @@
+.datepicker .btn {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+.datepicker .btn:hover {
+    background-color: #E0E0E0;
+}
+.datepicker .btn-primary {
+    background-color: #357EBD;
+    color: #FFFFFF;
+}
+.datepicker .btn-primary:hover {
+    background-color: #2D6CA2;
+}
