@@ -1,77 +1,44 @@
 'use strict';
 
-/**
- * Factory for Country
- */
-countryModule.factory('Country', ['$http', function($http) {
+/* Factory for Country */
 
-	// REST Service URL to manage country
+myAppServices.factory('Country', ['$http', function($http) {
     var entityURL = baseURL + '/country';
-	
-	/**
-     * Validate country
-     * @param country country
-     * @throws validation exception
-     */
-	var validate = function (country) {
+    var $this = {};
+    $this.getAll = function() {
+        return $http.get(entityURL);
+    };
+    $this.get = function(code) {
+        var url = entityURL + '/' + code;
+        return $http.get(url);
+    };
+	$this.create = function(country) {
+		$this.validate(country)
+		var url = entityURL;
+		return $http.post(url, country);
+    };
+    $this.update = function(country) {
+		$this.validate(country)
+		var url = entityURL + '/' + country.code;
+		return $http.put(url, country);
+    };
+    $this.delete = function(code) {
+        var url = entityURL + '/' + code;
+        return $http.delete(url);
+    };
+    $this.validate = function(country) {
+        var validationErrors = $this.getValidationErrors(country);
+		if( validationErrors.length > 0 ) {
+			throw validationErrors;
+		}
+		return true;
+    };
+	$this.getValidationErrors = function(country) {
 		var errors = [];
         if( country.code == null || country.code == '' ) {
-			errors.push('country.id.not.defined');
+			errors.push('code is not defined');
 		}
-		if(errors.length > 0) {
-			throw errors;
-		}
-    };
-	
-	return {
-        /**
-         * Get all countrys
-         * @return all countrys
-         */
-    	getAll: function() {
-        	return $http.get(entityURL);
-    	},
-
-        /**
-         * Get country
-         * @param code code
-         * @return country
-         */
-    	get: function(code) {
-    	    var url = entityURL + '/' + code;
-        	return $http.get(url);
-    	},
-
-        /**
-         * Create a new country
-         * @param country country
-         * @return country saved
-         */
-		create: function(country) {
-			validate(country)
-			var url = entityURL;
-			return $http.post(url, country);
-    	},
-
-        /**
-         * Update country
-         * @param country country
-         * @return country saved
-         */
-    	update: function(country) {
-			validate(country)
-			var url = entityURL + '/' + country.code;
-			return $http.put(url, country);
-    	},
-
-		/**
-         * Delete country
-         * @param code code
-         */
-    	delete: function(code) {
-        	var url = entityURL + '/' + code;
-        	return $http.delete(url);
-    	}
+		return errors;
 	};
 	return $this;
 }]);

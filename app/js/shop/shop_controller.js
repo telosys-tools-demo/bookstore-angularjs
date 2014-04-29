@@ -1,94 +1,133 @@
 'use strict';
 
-/**
- * Controller for Shop
- **/
-shopModule.controller('ShopCtrl', ['Shop', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Shop, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Shop */
+
+myAppControllers.controller('ShopCtrl', ['Shop', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Shop, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of shops
-    $scope.shops = [];
-	// shop to edit
+	// data
+
+    $scope.shops = {list: []};
     $scope.shop = null;
 
 	// referencies entities
-	$scope.items = {};
-    // employees
-	$scope.items.employees = [];
-    // countrys
-	$scope.items.countrys = [];
 
-    /**
-     * Load all referencies entities
-     */
-	$scope.loadAllReferencies = function() {
-		$scope.loadAllEmployees();
-		$scope.loadAllCountrys();
-    };
-    /**
-     * Load all employees
-     */
-	$scope.loadAllEmployees = function() {
+	$scope.items = {};
+	$scope.items.employees = [];
+	$scope.items.countrys = [];
+	$scope.loadAllEmployee = function() {
         $http({method: 'GET', url: baseURL + '/items/employee'}).
         success(function(data, status, headers, config) {
             $scope.items.employees = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
     };
-    /**
-     * Load all countrys
-     */
-	$scope.loadAllCountrys = function() {
+	$scope.loadAllCountry = function() {
         $http({method: 'GET', url: baseURL + '/items/country'}).
         success(function(data, status, headers, config) {
             $scope.items.countrys = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
+    };
+	
+	$scope.loadAllReferencies = function() {
+		$scope.loadAllEmployee();
+		$scope.loadAllCountry();
     };
     
-    /**
-     * Refresh shops list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanShopsInScope = function() {
+        $scope.shops.list = [];
+    };
+    $scope.cleanShopInScope = function() {
+        $scope.shop = null;
+    };
+    $scope.setAllShopsInScope = function(shops) {
+        $scope.shops.list = shops;
+    };
+    $scope.addShopInScope = function(shop) {
+        $scope.shops.list.push(shop);
+    };
+    $scope.setOneShopInScope = function(shop) {
+        $scope.shop = shop;
+    };
+    
+    // refresh data
+
     $scope.refreshShopList = function() {
     	try {
-			$scope.shops = [];
-        	Shop.getAll().then(
+        	$scope.cleanShopsInScope();
+	        Shop.getAll().then(
 				function(success) {
-        	        $scope.shops = success.data;
+        	        $scope.setAllShopsInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh shop
-     */
     $scope.refreshShop = function(code) {
     	try {
-        	$scope.shop = null;
+        	$scope.cleanShopInScope();
 	        Shop.get(code).then(
 				function(success) {
-        	        $scope.shop = success.data;
+        	        $scope.setOneShopInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the shops list page
-     */
+    // location
+
     $scope.goToShopList = function() {
         $scope.refreshShopList();
         $location.path('/shop');
     }
-    /**
-     * Go to the shop edit page
-     */
     $scope.goToShop = function(code) {
         $scope.refreshShop(code);
         $location.path('/shop/'+code);
@@ -96,12 +135,9 @@ shopModule.controller('ShopCtrl', ['Shop', '$scope', '$routeParams', '$http', '$
 
     // Actions
 
-    /**
-     * Save shop
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Shop.create;
@@ -110,44 +146,39 @@ shopModule.controller('ShopCtrl', ['Shop', '$scope', '$routeParams', '$http', '$
 			}
 			save($scope.shop).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.shop = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneShopInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete shop
-     */
     $scope.delete = function(code) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Shop.delete(code).then(
 				function(success) {
                 	$scope.goToShopList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.shop = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.code != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshShop($routeParams.code);
     } else {
-        // List page
         $scope.refreshShopList();
     }
     

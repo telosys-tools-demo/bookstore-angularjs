@@ -1,7 +1,12 @@
 		<fieldset class="col-sm-12 bordure">
 			<legend class="legende">{{ 'EmployeeGroup' | translate }}</legend>
 		
-			<div ng-include src="'partials/message-include.html'"></div>
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
 			
 			<table class="table table-striped">
 				<thead>
@@ -12,7 +17,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="employeeGroup in employeeGroups">
+					<tr ng-repeat="employeeGroup in employeeGroups.list">
 						<td>{{employeeGroup.employeeCode}}</td>
 						<td>{{employeeGroup.groupId}}</td>
 						<td><a class="btn btn-info" href="#/employeeGroup/{{employeeGroup.employeeCode}}/{{employeeGroup.groupId}}">{{ 'edit' | translate }}</a></td>

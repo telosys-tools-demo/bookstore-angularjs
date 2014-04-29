@@ -1,77 +1,44 @@
 'use strict';
 
-/**
- * Factory for Author
- */
-authorModule.factory('Author', ['$http', function($http) {
+/* Factory for Author */
 
-	// REST Service URL to manage author
+myAppServices.factory('Author', ['$http', function($http) {
     var entityURL = baseURL + '/author';
-	
-	/**
-     * Validate author
-     * @param author author
-     * @throws validation exception
-     */
-	var validate = function (author) {
+    var $this = {};
+    $this.getAll = function() {
+        return $http.get(entityURL);
+    };
+    $this.get = function(id) {
+        var url = entityURL + '/' + id;
+        return $http.get(url);
+    };
+	$this.create = function(author) {
+		$this.validate(author)
+		var url = entityURL;
+		return $http.post(url, author);
+    };
+    $this.update = function(author) {
+		$this.validate(author)
+		var url = entityURL + '/' + author.id;
+		return $http.put(url, author);
+    };
+    $this.delete = function(id) {
+        var url = entityURL + '/' + id;
+        return $http.delete(url);
+    };
+    $this.validate = function(author) {
+        var validationErrors = $this.getValidationErrors(author);
+		if( validationErrors.length > 0 ) {
+			throw validationErrors;
+		}
+		return true;
+    };
+	$this.getValidationErrors = function(author) {
 		var errors = [];
         if( author.id == null || author.id == '' ) {
-			errors.push('author.id.not.defined');
+			errors.push('id is not defined');
 		}
-		if(errors.length > 0) {
-			throw errors;
-		}
-    };
-	
-	return {
-        /**
-         * Get all authors
-         * @return all authors
-         */
-    	getAll: function() {
-        	return $http.get(entityURL);
-    	},
-
-        /**
-         * Get author
-         * @param id id
-         * @return author
-         */
-    	get: function(id) {
-    	    var url = entityURL + '/' + id;
-        	return $http.get(url);
-    	},
-
-        /**
-         * Create a new author
-         * @param author author
-         * @return author saved
-         */
-		create: function(author) {
-			validate(author)
-			var url = entityURL;
-			return $http.post(url, author);
-    	},
-
-        /**
-         * Update author
-         * @param author author
-         * @return author saved
-         */
-    	update: function(author) {
-			validate(author)
-			var url = entityURL + '/' + author.id;
-			return $http.put(url, author);
-    	},
-
-		/**
-         * Delete author
-         * @param id id
-         */
-    	delete: function(id) {
-        	var url = entityURL + '/' + id;
-        	return $http.delete(url);
-    	}
+		return errors;
 	};
 	return $this;
 }]);

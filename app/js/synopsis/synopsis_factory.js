@@ -1,77 +1,44 @@
 'use strict';
 
-/**
- * Factory for Synopsis
- */
-synopsisModule.factory('Synopsis', ['$http', function($http) {
+/* Factory for Synopsis */
 
-	// REST Service URL to manage synopsis
+myAppServices.factory('Synopsis', ['$http', function($http) {
     var entityURL = baseURL + '/synopsis';
-	
-	/**
-     * Validate synopsis
-     * @param synopsis synopsis
-     * @throws validation exception
-     */
-	var validate = function (synopsis) {
+    var $this = {};
+    $this.getAll = function() {
+        return $http.get(entityURL);
+    };
+    $this.get = function(bookId) {
+        var url = entityURL + '/' + bookId;
+        return $http.get(url);
+    };
+	$this.create = function(synopsis) {
+		$this.validate(synopsis)
+		var url = entityURL;
+		return $http.post(url, synopsis);
+    };
+    $this.update = function(synopsis) {
+		$this.validate(synopsis)
+		var url = entityURL + '/' + synopsis.bookId;
+		return $http.put(url, synopsis);
+    };
+    $this.delete = function(bookId) {
+        var url = entityURL + '/' + bookId;
+        return $http.delete(url);
+    };
+    $this.validate = function(synopsis) {
+        var validationErrors = $this.getValidationErrors(synopsis);
+		if( validationErrors.length > 0 ) {
+			throw validationErrors;
+		}
+		return true;
+    };
+	$this.getValidationErrors = function(synopsis) {
 		var errors = [];
         if( synopsis.bookId == null || synopsis.bookId == '' ) {
-			errors.push('synopsis.id.not.defined');
+			errors.push('bookId is not defined');
 		}
-		if(errors.length > 0) {
-			throw errors;
-		}
-    };
-	
-	return {
-        /**
-         * Get all synopsiss
-         * @return all synopsiss
-         */
-    	getAll: function() {
-        	return $http.get(entityURL);
-    	},
-
-        /**
-         * Get synopsis
-         * @param bookId bookId
-         * @return synopsis
-         */
-    	get: function(bookId) {
-    	    var url = entityURL + '/' + bookId;
-        	return $http.get(url);
-    	},
-
-        /**
-         * Create a new synopsis
-         * @param synopsis synopsis
-         * @return synopsis saved
-         */
-		create: function(synopsis) {
-			validate(synopsis)
-			var url = entityURL;
-			return $http.post(url, synopsis);
-    	},
-
-        /**
-         * Update synopsis
-         * @param synopsis synopsis
-         * @return synopsis saved
-         */
-    	update: function(synopsis) {
-			validate(synopsis)
-			var url = entityURL + '/' + synopsis.bookId;
-			return $http.put(url, synopsis);
-    	},
-
-		/**
-         * Delete synopsis
-         * @param bookId bookId
-         */
-    	delete: function(bookId) {
-        	var url = entityURL + '/' + bookId;
-        	return $http.delete(url);
-    	}
+		return errors;
 	};
 	return $this;
 }]);

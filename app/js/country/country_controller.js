@@ -1,68 +1,115 @@
 'use strict';
 
-/**
- * Controller for Country
- **/
-countryModule.controller('CountryCtrl', ['Country', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Country, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Country */
+
+myAppControllers.controller('CountryCtrl', ['Country', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Country, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of countrys
-    $scope.countrys = [];
-	// country to edit
+	// data
+
+    $scope.countrys = {list: []};
     $scope.country = null;
 
 	// referencies entities
-	$scope.items = {};
 
-    /**
-     * Load all referencies entities
-     */
+	$scope.items = {};
+	
 	$scope.loadAllReferencies = function() {
     };
     
-    /**
-     * Refresh countrys list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanCountrysInScope = function() {
+        $scope.countrys.list = [];
+    };
+    $scope.cleanCountryInScope = function() {
+        $scope.country = null;
+    };
+    $scope.setAllCountrysInScope = function(countrys) {
+        $scope.countrys.list = countrys;
+    };
+    $scope.addCountryInScope = function(country) {
+        $scope.countrys.list.push(country);
+    };
+    $scope.setOneCountryInScope = function(country) {
+        $scope.country = country;
+    };
+    
+    // refresh data
+
     $scope.refreshCountryList = function() {
     	try {
-			$scope.countrys = [];
-        	Country.getAll().then(
+        	$scope.cleanCountrysInScope();
+	        Country.getAll().then(
 				function(success) {
-        	        $scope.countrys = success.data;
+        	        $scope.setAllCountrysInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh country
-     */
     $scope.refreshCountry = function(code) {
     	try {
-        	$scope.country = null;
+        	$scope.cleanCountryInScope();
 	        Country.get(code).then(
 				function(success) {
-        	        $scope.country = success.data;
+        	        $scope.setOneCountryInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the countrys list page
-     */
+    // location
+
     $scope.goToCountryList = function() {
         $scope.refreshCountryList();
         $location.path('/country');
     }
-    /**
-     * Go to the country edit page
-     */
     $scope.goToCountry = function(code) {
         $scope.refreshCountry(code);
         $location.path('/country/'+code);
@@ -70,12 +117,9 @@ countryModule.controller('CountryCtrl', ['Country', '$scope', '$routeParams', '$
 
     // Actions
 
-    /**
-     * Save country
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Country.create;
@@ -84,44 +128,39 @@ countryModule.controller('CountryCtrl', ['Country', '$scope', '$routeParams', '$
 			}
 			save($scope.country).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.country = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneCountryInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete country
-     */
     $scope.delete = function(code) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Country.delete(code).then(
 				function(success) {
                 	$scope.goToCountryList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.country = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.code != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshCountry($routeParams.code);
     } else {
-        // List page
         $scope.refreshCountryList();
     }
     

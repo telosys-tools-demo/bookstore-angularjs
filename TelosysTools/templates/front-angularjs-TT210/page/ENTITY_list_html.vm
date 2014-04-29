@@ -1,0 +1,59 @@
+##--------------------------------------------------------------------------------------------------------
+#set( $_ = "$" )
+##--------------------------------------------------------------------------------------------------------
+## Key fields = fields in Primary Key    
+#set( $keyFields = $entity.getAttributesByCriteria( $const.KEY ) )
+##--------------------------------------------------------------------------------------------------------
+## Data fields = fields not in Primary Key and not in selected Links    
+#set( $dataFields = $entity.getAttributesByCriteria( $const.NOT_KEY, $const.NOT_IN_SELECTED_LINKS ) )
+##--------------------------------------------------------------------------------------------------------
+## #set( $itemVariable = $fn.uncapitalize($entity.name) )
+#set( $itemVariable = ${fn.uncapitalize($entity.name)} )
+##--------------------------------------------------------------------------------------------------------
+		<fieldset class="col-sm-12 bordure">
+			<legend class="legende">{{ '${entity.name}' | translate }}</legend>
+		
+			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
+       			{{ success | translate }}
+			</div>
+			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
+       			{{error}}
+			</div>
+			
+			<table class="table table-striped">
+## ---TABLE HEAD ------------------------------------------------------------------
+				<thead>
+					<tr>
+## KEY FIELDS
+#foreach( $field in $keyFields )
+						<th>{{ '${itemVariable}.${field.formattedName(0)}' | translate }}</th>
+#end
+## DATA FIELDS
+#foreach( $field in $dataFields )
+						<th>{{ '${itemVariable}.${field.formattedName(0)}' | translate }}</th>
+#end
+						<th><a class="btn btn-info" href='#/${itemVariable}/new'>{{ 'create' | translate }}</a></th>
+					</tr>
+				</thead>
+## ---TABLE BODY ------------------------------------------------------------------
+				<tbody>
+					<tr ng-repeat="${fn.uncapitalize($entity.name)} in ${fn.uncapitalize($entity.name)}s.list">
+## KEY FIELDS
+#foreach( $field in $keyFields )
+						<td>{{${fn.uncapitalize($entity.name)}.${field.formattedName(0)}}}</td>
+#end
+## DATA FIELDS
+#foreach( $field in $dataFields )
+#if( $field.formattedType(0) == "Date" ||  $field.formattedType(0) == "Calendar" )
+						<td>{{${fn.uncapitalize($entity.name)}.${field.formattedName(0)} | date:'shortDate'}}</td>
+#elseif( $field.fullType == "java.lang.Double" || $field.fullType == "java.lang.Integer" || $field.fullType == "java.lang.Long" || $field.fullType == "java.math.BigDecimal" || $field.fullType == "java.math.BigInteger" )
+						<td>{{${fn.uncapitalize($entity.name)}.${field.formattedName(0)} | number }}</td>
+#else
+						<td>{{${fn.uncapitalize($entity.name)}.${field.formattedName(0)}}}</td>
+#end
+#end
+						<td><a class="btn btn-info" href="#/${itemVariable}/$entity.keyAttributesNamesAsString('/', "{{${itemVariable}.", "}}")">{{ 'edit' | translate }}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>

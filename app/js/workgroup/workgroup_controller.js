@@ -1,68 +1,115 @@
 'use strict';
 
-/**
- * Controller for Workgroup
- **/
-workgroupModule.controller('WorkgroupCtrl', ['Workgroup', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Workgroup, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Workgroup */
+
+myAppControllers.controller('WorkgroupCtrl', ['Workgroup', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Workgroup, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of workgroups
-    $scope.workgroups = [];
-	// workgroup to edit
+	// data
+
+    $scope.workgroups = {list: []};
     $scope.workgroup = null;
 
 	// referencies entities
-	$scope.items = {};
 
-    /**
-     * Load all referencies entities
-     */
+	$scope.items = {};
+	
 	$scope.loadAllReferencies = function() {
     };
     
-    /**
-     * Refresh workgroups list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanWorkgroupsInScope = function() {
+        $scope.workgroups.list = [];
+    };
+    $scope.cleanWorkgroupInScope = function() {
+        $scope.workgroup = null;
+    };
+    $scope.setAllWorkgroupsInScope = function(workgroups) {
+        $scope.workgroups.list = workgroups;
+    };
+    $scope.addWorkgroupInScope = function(workgroup) {
+        $scope.workgroups.list.push(workgroup);
+    };
+    $scope.setOneWorkgroupInScope = function(workgroup) {
+        $scope.workgroup = workgroup;
+    };
+    
+    // refresh data
+
     $scope.refreshWorkgroupList = function() {
     	try {
-			$scope.workgroups = [];
-        	Workgroup.getAll().then(
+        	$scope.cleanWorkgroupsInScope();
+	        Workgroup.getAll().then(
 				function(success) {
-        	        $scope.workgroups = success.data;
+        	        $scope.setAllWorkgroupsInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh workgroup
-     */
     $scope.refreshWorkgroup = function(id) {
     	try {
-        	$scope.workgroup = null;
+        	$scope.cleanWorkgroupInScope();
 	        Workgroup.get(id).then(
 				function(success) {
-        	        $scope.workgroup = success.data;
+        	        $scope.setOneWorkgroupInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the workgroups list page
-     */
+    // location
+
     $scope.goToWorkgroupList = function() {
         $scope.refreshWorkgroupList();
         $location.path('/workgroup');
     }
-    /**
-     * Go to the workgroup edit page
-     */
     $scope.goToWorkgroup = function(id) {
         $scope.refreshWorkgroup(id);
         $location.path('/workgroup/'+id);
@@ -70,12 +117,9 @@ workgroupModule.controller('WorkgroupCtrl', ['Workgroup', '$scope', '$routeParam
 
     // Actions
 
-    /**
-     * Save workgroup
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Workgroup.create;
@@ -84,44 +128,39 @@ workgroupModule.controller('WorkgroupCtrl', ['Workgroup', '$scope', '$routeParam
 			}
 			save($scope.workgroup).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.workgroup = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneWorkgroupInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete workgroup
-     */
     $scope.delete = function(id) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Workgroup.delete(id).then(
 				function(success) {
                 	$scope.goToWorkgroupList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.workgroup = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.id != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshWorkgroup($routeParams.id);
     } else {
-        // List page
         $scope.refreshWorkgroupList();
     }
     

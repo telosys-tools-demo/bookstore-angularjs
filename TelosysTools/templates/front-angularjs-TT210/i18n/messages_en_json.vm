@@ -1,0 +1,23 @@
+{
+	"welcome" : "Welcome",
+	
+	"english" : "English",
+    "french" : "Fran\u00e7ais",
+	
+	"create" : "Create",
+	"edit" : "Edit",
+	"delete" : "Delete",
+	"delete ok" : "Delete ok",
+	"save" : "Save",
+	"save ok" : "Save ok",
+	"cancel" : "Cancel",
+#foreach( $entity in $selectedEntities )
+
+	"${entity.name}" : "${entity.name}",
+#foreach( $field in $entity.attributes )
+	"${fn.uncapitalize($entity.name)}.${field.formattedName(0)}" : "${field.formattedName(0)}",
+#end
+#end
+
+	"app.version" : "Version"
+}

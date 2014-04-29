@@ -1,0 +1,49 @@
+#set( $_ = ${DOLLAR} )
+##--------------------------------------------------------------------------------------------
+'use strict';
+
+/* Factory for ${entity.name} */
+
+myAppServices.factory('${entity.name}', ['${_}http', function(${_}http) {
+    var entityURL = baseURL + '/${fn.uncapitalize($entity.name)}';
+    var ${_}this = {};
+    ${_}this.getAll = function() {
+        return ${_}http.get(entityURL);
+    };
+    ${_}this.get = function(${entity.keyAttributesNamesAsString(', ', '', '')}) {
+        var url = entityURL + '/' + ${entity.keyAttributesNamesAsString(" + '/' + ", "", "")};
+        return ${_}http.get(url);
+    };
+	${_}this.create = function(${fn.uncapitalize($entity.name)}) {
+		${_}this.validate(${fn.uncapitalize($entity.name)})
+		var url = entityURL;
+		return ${_}http.post(url, ${fn.uncapitalize($entity.name)});
+    };
+    ${_}this.update = function(${fn.uncapitalize($entity.name)}) {
+		${_}this.validate(${fn.uncapitalize($entity.name)})
+		var url = entityURL + '/' + ${entity.keyAttributesNamesAsString(" + '/' + ", "$fn.uncapitalize($entity.name).", "")};
+		return ${_}http.put(url, ${fn.uncapitalize($entity.name)});
+    };
+    ${_}this.delete = function(${entity.keyAttributesNamesAsString(', ', '', '')}) {
+        var url = entityURL + '/' + ${entity.keyAttributesNamesAsString(" + '/' + ", "", "")};
+        return ${_}http.delete(url);
+    };
+    ${_}this.validate = function(${fn.uncapitalize($entity.name)}) {
+        var validationErrors = ${_}this.getValidationErrors(${fn.uncapitalize($entity.name)});
+		if( validationErrors.length > 0 ) {
+			throw validationErrors;
+		}
+		return true;
+    };
+	${_}this.getValidationErrors = function(${fn.uncapitalize($entity.name)}) {
+		var errors = [];
+#foreach( $attribute in $entity.keyAttributes )
+        if( ${fn.uncapitalize($entity.name)}.${attribute.name} == null || ${fn.uncapitalize($entity.name)}.${attribute.name} == '' ) {
+			errors.push('${attribute.name} is not defined');
+		}
+#end
+		return errors;
+	};
+	return ${_}this;
+}]);
+

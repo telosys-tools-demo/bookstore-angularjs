@@ -1,81 +1,124 @@
 'use strict';
 
-/**
- * Controller for Customer
- **/
-customerModule.controller('CustomerCtrl', ['Customer', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Customer, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Customer */
+
+myAppControllers.controller('CustomerCtrl', ['Customer', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Customer, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of customers
-    $scope.customers = [];
-	// customer to edit
+	// data
+
+    $scope.customers = {list: []};
     $scope.customer = null;
 
 	// referencies entities
-	$scope.items = {};
-    // countrys
-	$scope.items.countrys = [];
 
-    /**
-     * Load all referencies entities
-     */
-	$scope.loadAllReferencies = function() {
-		$scope.loadAllCountrys();
-    };
-    /**
-     * Load all countrys
-     */
-	$scope.loadAllCountrys = function() {
+	$scope.items = {};
+	$scope.items.countrys = [];
+	$scope.loadAllCountry = function() {
         $http({method: 'GET', url: baseURL + '/items/country'}).
         success(function(data, status, headers, config) {
             $scope.items.countrys = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
+    };
+	
+	$scope.loadAllReferencies = function() {
+		$scope.loadAllCountry();
     };
     
-    /**
-     * Refresh customers list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanCustomersInScope = function() {
+        $scope.customers.list = [];
+    };
+    $scope.cleanCustomerInScope = function() {
+        $scope.customer = null;
+    };
+    $scope.setAllCustomersInScope = function(customers) {
+        $scope.customers.list = customers;
+    };
+    $scope.addCustomerInScope = function(customer) {
+        $scope.customers.list.push(customer);
+    };
+    $scope.setOneCustomerInScope = function(customer) {
+        $scope.customer = customer;
+    };
+    
+    // refresh data
+
     $scope.refreshCustomerList = function() {
     	try {
-			$scope.customers = [];
-        	Customer.getAll().then(
+        	$scope.cleanCustomersInScope();
+	        Customer.getAll().then(
 				function(success) {
-        	        $scope.customers = success.data;
+        	        $scope.setAllCustomersInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh customer
-     */
     $scope.refreshCustomer = function(code) {
     	try {
-        	$scope.customer = null;
+        	$scope.cleanCustomerInScope();
 	        Customer.get(code).then(
 				function(success) {
-        	        $scope.customer = success.data;
+        	        $scope.setOneCustomerInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the customers list page
-     */
+    // location
+
     $scope.goToCustomerList = function() {
         $scope.refreshCustomerList();
         $location.path('/customer');
     }
-    /**
-     * Go to the customer edit page
-     */
     $scope.goToCustomer = function(code) {
         $scope.refreshCustomer(code);
         $location.path('/customer/'+code);
@@ -83,12 +126,9 @@ customerModule.controller('CustomerCtrl', ['Customer', '$scope', '$routeParams',
 
     // Actions
 
-    /**
-     * Save customer
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Customer.create;
@@ -97,44 +137,39 @@ customerModule.controller('CustomerCtrl', ['Customer', '$scope', '$routeParams',
 			}
 			save($scope.customer).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.customer = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneCustomerInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete customer
-     */
     $scope.delete = function(code) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Customer.delete(code).then(
 				function(success) {
                 	$scope.goToCustomerList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.customer = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.code != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshCustomer($routeParams.code);
     } else {
-        // List page
         $scope.refreshCustomerList();
     }
     

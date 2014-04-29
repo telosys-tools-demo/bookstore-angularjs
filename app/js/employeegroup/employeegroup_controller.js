@@ -1,68 +1,115 @@
 'use strict';
 
-/**
- * Controller for EmployeeGroup
- **/
-employeeGroupModule.controller('EmployeeGroupCtrl', ['EmployeeGroup', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(EmployeeGroup, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for EmployeeGroup */
+
+myAppControllers.controller('EmployeeGroupCtrl', ['EmployeeGroup', '$scope', '$routeParams', '$http', '$location', '$cookies', function(EmployeeGroup, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of employeeGroups
-    $scope.employeeGroups = [];
-	// employeeGroup to edit
+	// data
+
+    $scope.employeeGroups = {list: []};
     $scope.employeeGroup = null;
 
 	// referencies entities
-	$scope.items = {};
 
-    /**
-     * Load all referencies entities
-     */
+	$scope.items = {};
+	
 	$scope.loadAllReferencies = function() {
     };
     
-    /**
-     * Refresh employeeGroups list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanEmployeeGroupsInScope = function() {
+        $scope.employeeGroups.list = [];
+    };
+    $scope.cleanEmployeeGroupInScope = function() {
+        $scope.employeeGroup = null;
+    };
+    $scope.setAllEmployeeGroupsInScope = function(employeeGroups) {
+        $scope.employeeGroups.list = employeeGroups;
+    };
+    $scope.addEmployeeGroupInScope = function(employeeGroup) {
+        $scope.employeeGroups.list.push(employeeGroup);
+    };
+    $scope.setOneEmployeeGroupInScope = function(employeeGroup) {
+        $scope.employeeGroup = employeeGroup;
+    };
+    
+    // refresh data
+
     $scope.refreshEmployeeGroupList = function() {
     	try {
-			$scope.employeeGroups = [];
-        	EmployeeGroup.getAll().then(
+        	$scope.cleanEmployeeGroupsInScope();
+	        EmployeeGroup.getAll().then(
 				function(success) {
-        	        $scope.employeeGroups = success.data;
+        	        $scope.setAllEmployeeGroupsInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh employeeGroup
-     */
     $scope.refreshEmployeeGroup = function(employeeCode, groupId) {
     	try {
-        	$scope.employeeGroup = null;
+        	$scope.cleanEmployeeGroupInScope();
 	        EmployeeGroup.get(employeeCode, groupId).then(
 				function(success) {
-        	        $scope.employeeGroup = success.data;
+        	        $scope.setOneEmployeeGroupInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the employeeGroups list page
-     */
+    // location
+
     $scope.goToEmployeeGroupList = function() {
         $scope.refreshEmployeeGroupList();
         $location.path('/employeeGroup');
     }
-    /**
-     * Go to the employeeGroup edit page
-     */
     $scope.goToEmployeeGroup = function(employeeCode, groupId) {
         $scope.refreshEmployeeGroup(employeeCode, groupId);
         $location.path('/employeeGroup/'+employeeCode+'/'+groupId);
@@ -70,12 +117,9 @@ employeeGroupModule.controller('EmployeeGroupCtrl', ['EmployeeGroup', '$scope', 
 
     // Actions
 
-    /**
-     * Save employeeGroup
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = EmployeeGroup.create;
@@ -84,44 +128,39 @@ employeeGroupModule.controller('EmployeeGroupCtrl', ['EmployeeGroup', '$scope', 
 			}
 			save($scope.employeeGroup).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.employeeGroup = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneEmployeeGroupInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete employeeGroup
-     */
     $scope.delete = function(employeeCode, groupId) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    EmployeeGroup.delete(employeeCode, groupId).then(
 				function(success) {
                 	$scope.goToEmployeeGroupList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.employeeGroup = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.employeeCode != null && $routeParams.groupId != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshEmployeeGroup($routeParams.employeeCode, $routeParams.groupId);
     } else {
-        // List page
         $scope.refreshEmployeeGroupList();
     }
     

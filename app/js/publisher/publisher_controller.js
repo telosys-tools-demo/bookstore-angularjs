@@ -1,81 +1,124 @@
 'use strict';
 
-/**
- * Controller for Publisher
- **/
-publisherModule.controller('PublisherCtrl', ['Publisher', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Publisher, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Publisher */
+
+myAppControllers.controller('PublisherCtrl', ['Publisher', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Publisher, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of publishers
-    $scope.publishers = [];
-	// publisher to edit
+	// data
+
+    $scope.publishers = {list: []};
     $scope.publisher = null;
 
 	// referencies entities
-	$scope.items = {};
-    // countrys
-	$scope.items.countrys = [];
 
-    /**
-     * Load all referencies entities
-     */
-	$scope.loadAllReferencies = function() {
-		$scope.loadAllCountrys();
-    };
-    /**
-     * Load all countrys
-     */
-	$scope.loadAllCountrys = function() {
+	$scope.items = {};
+	$scope.items.countrys = [];
+	$scope.loadAllCountry = function() {
         $http({method: 'GET', url: baseURL + '/items/country'}).
         success(function(data, status, headers, config) {
             $scope.items.countrys = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
+    };
+	
+	$scope.loadAllReferencies = function() {
+		$scope.loadAllCountry();
     };
     
-    /**
-     * Refresh publishers list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanPublishersInScope = function() {
+        $scope.publishers.list = [];
+    };
+    $scope.cleanPublisherInScope = function() {
+        $scope.publisher = null;
+    };
+    $scope.setAllPublishersInScope = function(publishers) {
+        $scope.publishers.list = publishers;
+    };
+    $scope.addPublisherInScope = function(publisher) {
+        $scope.publishers.list.push(publisher);
+    };
+    $scope.setOnePublisherInScope = function(publisher) {
+        $scope.publisher = publisher;
+    };
+    
+    // refresh data
+
     $scope.refreshPublisherList = function() {
     	try {
-			$scope.publishers = [];
-        	Publisher.getAll().then(
+        	$scope.cleanPublishersInScope();
+	        Publisher.getAll().then(
 				function(success) {
-        	        $scope.publishers = success.data;
+        	        $scope.setAllPublishersInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh publisher
-     */
     $scope.refreshPublisher = function(code) {
     	try {
-        	$scope.publisher = null;
+        	$scope.cleanPublisherInScope();
 	        Publisher.get(code).then(
 				function(success) {
-        	        $scope.publisher = success.data;
+        	        $scope.setOnePublisherInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the publishers list page
-     */
+    // location
+
     $scope.goToPublisherList = function() {
         $scope.refreshPublisherList();
         $location.path('/publisher');
     }
-    /**
-     * Go to the publisher edit page
-     */
     $scope.goToPublisher = function(code) {
         $scope.refreshPublisher(code);
         $location.path('/publisher/'+code);
@@ -83,12 +126,9 @@ publisherModule.controller('PublisherCtrl', ['Publisher', '$scope', '$routeParam
 
     // Actions
 
-    /**
-     * Save publisher
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Publisher.create;
@@ -97,44 +137,39 @@ publisherModule.controller('PublisherCtrl', ['Publisher', '$scope', '$routeParam
 			}
 			save($scope.publisher).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.publisher = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOnePublisherInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete publisher
-     */
     $scope.delete = function(code) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Publisher.delete(code).then(
 				function(success) {
                 	$scope.goToPublisherList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.publisher = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.code != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshPublisher($routeParams.code);
     } else {
-        // List page
         $scope.refreshPublisherList();
     }
     

@@ -1,107 +1,142 @@
 'use strict';
 
-/**
- * Controller for BookOrder
- **/
-bookOrderModule.controller('BookOrderCtrl', ['BookOrder', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(BookOrder, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for BookOrder */
+
+myAppControllers.controller('BookOrderCtrl', ['BookOrder', '$scope', '$routeParams', '$http', '$location', '$cookies', function(BookOrder, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of bookOrders
-    $scope.bookOrders = [];
-	// bookOrder to edit
+	// data
+
+    $scope.bookOrders = {list: []};
     $scope.bookOrder = null;
 
 	// referencies entities
-	$scope.items = {};
-    // shops
-	$scope.items.shops = [];
-    // employees
-	$scope.items.employees = [];
-    // customers
-	$scope.items.customers = [];
 
-    /**
-     * Load all referencies entities
-     */
-	$scope.loadAllReferencies = function() {
-		$scope.loadAllShops();
-		$scope.loadAllEmployees();
-		$scope.loadAllCustomers();
-    };
-    /**
-     * Load all shops
-     */
-	$scope.loadAllShops = function() {
+	$scope.items = {};
+	$scope.items.shops = [];
+	$scope.items.employees = [];
+	$scope.items.customers = [];
+	$scope.loadAllShop = function() {
         $http({method: 'GET', url: baseURL + '/items/shop'}).
         success(function(data, status, headers, config) {
             $scope.items.shops = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
     };
-    /**
-     * Load all employees
-     */
-	$scope.loadAllEmployees = function() {
+	$scope.loadAllEmployee = function() {
         $http({method: 'GET', url: baseURL + '/items/employee'}).
         success(function(data, status, headers, config) {
             $scope.items.employees = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
     };
-    /**
-     * Load all customers
-     */
-	$scope.loadAllCustomers = function() {
+	$scope.loadAllCustomer = function() {
         $http({method: 'GET', url: baseURL + '/items/customer'}).
         success(function(data, status, headers, config) {
             $scope.items.customers = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
+    };
+	
+	$scope.loadAllReferencies = function() {
+		$scope.loadAllShop();
+		$scope.loadAllEmployee();
+		$scope.loadAllCustomer();
     };
     
-    /**
-     * Refresh bookOrders list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanBookOrdersInScope = function() {
+        $scope.bookOrders.list = [];
+    };
+    $scope.cleanBookOrderInScope = function() {
+        $scope.bookOrder = null;
+    };
+    $scope.setAllBookOrdersInScope = function(bookOrders) {
+        $scope.bookOrders.list = bookOrders;
+    };
+    $scope.addBookOrderInScope = function(bookOrder) {
+        $scope.bookOrders.list.push(bookOrder);
+    };
+    $scope.setOneBookOrderInScope = function(bookOrder) {
+        $scope.bookOrder = bookOrder;
+    };
+    
+    // refresh data
+
     $scope.refreshBookOrderList = function() {
     	try {
-			$scope.bookOrders = [];
-        	BookOrder.getAll().then(
+        	$scope.cleanBookOrdersInScope();
+	        BookOrder.getAll().then(
 				function(success) {
-        	        $scope.bookOrders = success.data;
+        	        $scope.setAllBookOrdersInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh bookOrder
-     */
     $scope.refreshBookOrder = function(id) {
     	try {
-        	$scope.bookOrder = null;
+        	$scope.cleanBookOrderInScope();
 	        BookOrder.get(id).then(
 				function(success) {
-        	        $scope.bookOrder = success.data;
+        	        $scope.setOneBookOrderInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the bookOrders list page
-     */
+    // location
+
     $scope.goToBookOrderList = function() {
         $scope.refreshBookOrderList();
         $location.path('/bookOrder');
     }
-    /**
-     * Go to the bookOrder edit page
-     */
     $scope.goToBookOrder = function(id) {
         $scope.refreshBookOrder(id);
         $location.path('/bookOrder/'+id);
@@ -109,12 +144,9 @@ bookOrderModule.controller('BookOrderCtrl', ['BookOrder', '$scope', '$routeParam
 
     // Actions
 
-    /**
-     * Save bookOrder
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = BookOrder.create;
@@ -123,44 +155,39 @@ bookOrderModule.controller('BookOrderCtrl', ['BookOrder', '$scope', '$routeParam
 			}
 			save($scope.bookOrder).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.bookOrder = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneBookOrderInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete bookOrder
-     */
     $scope.delete = function(id) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    BookOrder.delete(id).then(
 				function(success) {
                 	$scope.goToBookOrderList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.bookOrder = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.id != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshBookOrder($routeParams.id);
     } else {
-        // List page
         $scope.refreshBookOrderList();
     }
     

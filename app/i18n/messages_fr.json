@@ -16,13 +16,11 @@
 	"author.id" : "id",
 	"author.firstName" : "firstName",
 	"author.lastName" : "lastName",
-	"author.id.not.defined" : "L'identfiant de Author n'est pas d\u00E9fini",
 
 	"Badge" : "Badge",
 	"badge.badgeNumber" : "badgeNumber",
 	"badge.authorizationLevel" : "authorizationLevel",
 	"badge.endOfValidity" : "endOfValidity",
-	"badge.id.not.defined" : "L'identfiant de Badge n'est pas d\u00E9fini",
 
 	"Book" : "Book",
 	"book.id" : "id",
@@ -35,7 +33,6 @@
 	"book.discount" : "discount",
 	"book.availability" : "availability",
 	"book.bestSeller" : "bestSeller",
-	"book.id.not.defined" : "L'identfiant de Book n'est pas d\u00E9fini",
 
 	"BookOrder" : "BookOrder",
 	"bookOrder.id" : "id",
@@ -44,19 +41,16 @@
 	"bookOrder.employeeCode" : "employeeCode",
 	"bookOrder.date" : "date",
 	"bookOrder.state" : "state",
-	"bookOrder.id.not.defined" : "L'identfiant de BookOrder n'est pas d\u00E9fini",
 
 	"BookOrderItem" : "BookOrderItem",
 	"bookOrderItem.bookOrderId" : "bookOrderId",
 	"bookOrderItem.bookId" : "bookId",
 	"bookOrderItem.quantity" : "quantity",
 	"bookOrderItem.price" : "price",
-	"bookOrderItem.id.not.defined" : "L'identfiant de BookOrderItem n'est pas d\u00E9fini",
 
 	"Country" : "Country",
 	"country.code" : "code",
 	"country.name" : "name",
-	"country.id.not.defined" : "L'identfiant de Country n'est pas d\u00E9fini",
 
 	"Customer" : "Customer",
 	"customer.code" : "code",
@@ -70,7 +64,6 @@
 	"customer.zipCode" : "zipCode",
 	"customer.phone" : "phone",
 	"customer.reviewer" : "reviewer",
-	"customer.id.not.defined" : "L'identfiant de Customer n'est pas d\u00E9fini",
 
 	"Employee" : "Employee",
 	"employee.code" : "code",
@@ -80,12 +73,10 @@
 	"employee.manager" : "manager",
 	"employee.badgeNumber" : "badgeNumber",
 	"employee.email" : "email",
-	"employee.id.not.defined" : "L'identfiant de Employee n'est pas d\u00E9fini",
 
 	"EmployeeGroup" : "EmployeeGroup",
 	"employeeGroup.employeeCode" : "employeeCode",
 	"employeeGroup.groupId" : "groupId",
-	"employeeGroup.id.not.defined" : "L'identfiant de EmployeeGroup n'est pas d\u00E9fini",
 
 	"Publisher" : "Publisher",
 	"publisher.code" : "code",
@@ -96,7 +87,6 @@
 	"publisher.city" : "city",
 	"publisher.zipCode" : "zipCode",
 	"publisher.phone" : "phone",
-	"publisher.id.not.defined" : "L'identfiant de Publisher n'est pas d\u00E9fini",
 
 	"Review" : "Review",
 	"review.customerCode" : "customerCode",
@@ -105,7 +95,6 @@
 	"review.reviewNote" : "reviewNote",
 	"review.creation" : "creation",
 	"review.lastUpdate" : "lastUpdate",
-	"review.id.not.defined" : "L'identfiant de Review n'est pas d\u00E9fini",
 
 	"Shop" : "Shop",
 	"shop.code" : "code",
@@ -118,23 +107,16 @@
 	"shop.phone" : "phone",
 	"shop.email" : "email",
 	"shop.executive" : "executive",
-	"shop.id.not.defined" : "L'identfiant de Shop n'est pas d\u00E9fini",
 
 	"Synopsis" : "Synopsis",
 	"synopsis.bookId" : "bookId",
 	"synopsis.synopsis" : "synopsis",
-	"synopsis.id.not.defined" : "L'identfiant de Synopsis n'est pas d\u00E9fini",
 
 	"Workgroup" : "Workgroup",
 	"workgroup.id" : "id",
 	"workgroup.name" : "name",
 	"workgroup.description" : "description",
 	"workgroup.creationDate" : "creationDate",
-	"workgroup.id.not.defined" : "L'identfiant de Workgroup n'est pas d\u00E9fini",
-
-	"server.not.responding": "Le serveur ne r\u00e9pond pas",
-	"url.invalid": "URL invalide : {value}",
-	"url.bad": "URL incorrecte : {value}",
 
 	"app.version" : "Version"
 }

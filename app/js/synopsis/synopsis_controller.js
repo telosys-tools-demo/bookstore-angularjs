@@ -1,81 +1,124 @@
 'use strict';
 
-/**
- * Controller for Synopsis
- **/
-synopsisModule.controller('SynopsisCtrl', ['Synopsis', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Synopsis, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Synopsis */
+
+myAppControllers.controller('SynopsisCtrl', ['Synopsis', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Synopsis, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of synopsiss
-    $scope.synopsiss = [];
-	// synopsis to edit
+	// data
+
+    $scope.synopsiss = {list: []};
     $scope.synopsis = null;
 
 	// referencies entities
-	$scope.items = {};
-    // books
-	$scope.items.books = [];
 
-    /**
-     * Load all referencies entities
-     */
-	$scope.loadAllReferencies = function() {
-		$scope.loadAllBooks();
-    };
-    /**
-     * Load all books
-     */
-	$scope.loadAllBooks = function() {
+	$scope.items = {};
+	$scope.items.books = [];
+	$scope.loadAllBook = function() {
         $http({method: 'GET', url: baseURL + '/items/book'}).
         success(function(data, status, headers, config) {
             $scope.items.books = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
+    };
+	
+	$scope.loadAllReferencies = function() {
+		$scope.loadAllBook();
     };
     
-    /**
-     * Refresh synopsiss list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanSynopsissInScope = function() {
+        $scope.synopsiss.list = [];
+    };
+    $scope.cleanSynopsisInScope = function() {
+        $scope.synopsis = null;
+    };
+    $scope.setAllSynopsissInScope = function(synopsiss) {
+        $scope.synopsiss.list = synopsiss;
+    };
+    $scope.addSynopsisInScope = function(synopsis) {
+        $scope.synopsiss.list.push(synopsis);
+    };
+    $scope.setOneSynopsisInScope = function(synopsis) {
+        $scope.synopsis = synopsis;
+    };
+    
+    // refresh data
+
     $scope.refreshSynopsisList = function() {
     	try {
-			$scope.synopsiss = [];
-        	Synopsis.getAll().then(
+        	$scope.cleanSynopsissInScope();
+	        Synopsis.getAll().then(
 				function(success) {
-        	        $scope.synopsiss = success.data;
+        	        $scope.setAllSynopsissInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh synopsis
-     */
     $scope.refreshSynopsis = function(bookId) {
     	try {
-        	$scope.synopsis = null;
+        	$scope.cleanSynopsisInScope();
 	        Synopsis.get(bookId).then(
 				function(success) {
-        	        $scope.synopsis = success.data;
+        	        $scope.setOneSynopsisInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the synopsiss list page
-     */
+    // location
+
     $scope.goToSynopsisList = function() {
         $scope.refreshSynopsisList();
         $location.path('/synopsis');
     }
-    /**
-     * Go to the synopsis edit page
-     */
     $scope.goToSynopsis = function(bookId) {
         $scope.refreshSynopsis(bookId);
         $location.path('/synopsis/'+bookId);
@@ -83,12 +126,9 @@ synopsisModule.controller('SynopsisCtrl', ['Synopsis', '$scope', '$routeParams',
 
     // Actions
 
-    /**
-     * Save synopsis
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Synopsis.create;
@@ -97,44 +137,39 @@ synopsisModule.controller('SynopsisCtrl', ['Synopsis', '$scope', '$routeParams',
 			}
 			save($scope.synopsis).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.synopsis = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneSynopsisInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete synopsis
-     */
     $scope.delete = function(bookId) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Synopsis.delete(bookId).then(
 				function(success) {
                 	$scope.goToSynopsisList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.synopsis = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.bookId != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshSynopsis($routeParams.bookId);
     } else {
-        // List page
         $scope.refreshSynopsisList();
     }
     

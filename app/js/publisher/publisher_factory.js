@@ -1,77 +1,44 @@
 'use strict';
 
-/**
- * Factory for Publisher
- */
-publisherModule.factory('Publisher', ['$http', function($http) {
+/* Factory for Publisher */
 
-	// REST Service URL to manage publisher
+myAppServices.factory('Publisher', ['$http', function($http) {
     var entityURL = baseURL + '/publisher';
-	
-	/**
-     * Validate publisher
-     * @param publisher publisher
-     * @throws validation exception
-     */
-	var validate = function (publisher) {
+    var $this = {};
+    $this.getAll = function() {
+        return $http.get(entityURL);
+    };
+    $this.get = function(code) {
+        var url = entityURL + '/' + code;
+        return $http.get(url);
+    };
+	$this.create = function(publisher) {
+		$this.validate(publisher)
+		var url = entityURL;
+		return $http.post(url, publisher);
+    };
+    $this.update = function(publisher) {
+		$this.validate(publisher)
+		var url = entityURL + '/' + publisher.code;
+		return $http.put(url, publisher);
+    };
+    $this.delete = function(code) {
+        var url = entityURL + '/' + code;
+        return $http.delete(url);
+    };
+    $this.validate = function(publisher) {
+        var validationErrors = $this.getValidationErrors(publisher);
+		if( validationErrors.length > 0 ) {
+			throw validationErrors;
+		}
+		return true;
+    };
+	$this.getValidationErrors = function(publisher) {
 		var errors = [];
         if( publisher.code == null || publisher.code == '' ) {
-			errors.push('publisher.id.not.defined');
+			errors.push('code is not defined');
 		}
-		if(errors.length > 0) {
-			throw errors;
-		}
-    };
-	
-	return {
-        /**
-         * Get all publishers
-         * @return all publishers
-         */
-    	getAll: function() {
-        	return $http.get(entityURL);
-    	},
-
-        /**
-         * Get publisher
-         * @param code code
-         * @return publisher
-         */
-    	get: function(code) {
-    	    var url = entityURL + '/' + code;
-        	return $http.get(url);
-    	},
-
-        /**
-         * Create a new publisher
-         * @param publisher publisher
-         * @return publisher saved
-         */
-		create: function(publisher) {
-			validate(publisher)
-			var url = entityURL;
-			return $http.post(url, publisher);
-    	},
-
-        /**
-         * Update publisher
-         * @param publisher publisher
-         * @return publisher saved
-         */
-    	update: function(publisher) {
-			validate(publisher)
-			var url = entityURL + '/' + publisher.code;
-			return $http.put(url, publisher);
-    	},
-
-		/**
-         * Delete publisher
-         * @param code code
-         */
-    	delete: function(code) {
-        	var url = entityURL + '/' + code;
-        	return $http.delete(url);
-    	}
+		return errors;
 	};
 	return $this;
 }]);

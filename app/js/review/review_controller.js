@@ -1,94 +1,133 @@
 'use strict';
 
-/**
- * Controller for Review
- **/
-reviewModule.controller('ReviewCtrl', ['Review', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Review, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
+/* Controller for Review */
+
+myAppControllers.controller('ReviewCtrl', ['Review', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Review, $scope, $routeParams, $http, $location, $cookies) {
 	
-    // edition mode
+    // mode
+
     $scope.mode = null;
     
-	// list of reviews
-    $scope.reviews = [];
-	// review to edit
+	// data
+
+    $scope.reviews = {list: []};
     $scope.review = null;
 
 	// referencies entities
-	$scope.items = {};
-    // books
-	$scope.items.books = [];
-    // customers
-	$scope.items.customers = [];
 
-    /**
-     * Load all referencies entities
-     */
-	$scope.loadAllReferencies = function() {
-		$scope.loadAllBooks();
-		$scope.loadAllCustomers();
-    };
-    /**
-     * Load all books
-     */
-	$scope.loadAllBooks = function() {
+	$scope.items = {};
+	$scope.items.books = [];
+	$scope.items.customers = [];
+	$scope.loadAllBook = function() {
         $http({method: 'GET', url: baseURL + '/items/book'}).
         success(function(data, status, headers, config) {
             $scope.items.books = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
     };
-    /**
-     * Load all customers
-     */
-	$scope.loadAllCustomers = function() {
+	$scope.loadAllCustomer = function() {
         $http({method: 'GET', url: baseURL + '/items/customer'}).
         success(function(data, status, headers, config) {
             $scope.items.customers = data;
         }).
-        error(MessageHandler.manageError);
+        error($scope.manageError);
+    };
+	
+	$scope.loadAllReferencies = function() {
+		$scope.loadAllBook();
+		$scope.loadAllCustomer();
     };
     
-    /**
-     * Refresh reviews list
-     */
+    // message
+
+	$scope.message = {};
+    $scope.message.successs = [];
+    $scope.message.errors = [];
+	$scope.cleanMessage = function() {
+        $scope.message.successs = [];
+        $scope.message.errors = [];
+    };
+    $scope.addSuccess = function(success) {
+        $scope.message.successs.push(success);
+    };
+    $scope.addError = function(error) {
+        $scope.message.errors.push(error);
+    };
+	$scope.manageError = function(http) {
+		if( http.status === 404 ) {
+			if( http.data == null || http.data === "" ) {
+				$scope.addError('The server is not responding');
+			} else {
+				$scope.addError('Invalid URL : ' + http.config.url);
+			}
+		} else if( http.status === 400 ) {
+			if(http.data == null) {
+				$scope.addError('Bad URL : ' + http.config.url);
+			} else {
+				$scope.addError(http.data);
+			}
+		} else {
+        	if( http.data != null && http.data !== "" ) {
+            	$scope.addError(http.data);
+        	}
+		}
+    };
+	$scope.manageException = function(error) {
+		$scope.addError(error);
+    };
+
+	// display data
+
+	
+    $scope.cleanReviewsInScope = function() {
+        $scope.reviews.list = [];
+    };
+    $scope.cleanReviewInScope = function() {
+        $scope.review = null;
+    };
+    $scope.setAllReviewsInScope = function(reviews) {
+        $scope.reviews.list = reviews;
+    };
+    $scope.addReviewInScope = function(review) {
+        $scope.reviews.list.push(review);
+    };
+    $scope.setOneReviewInScope = function(review) {
+        $scope.review = review;
+    };
+    
+    // refresh data
+
     $scope.refreshReviewList = function() {
     	try {
-			$scope.reviews = [];
-        	Review.getAll().then(
+        	$scope.cleanReviewsInScope();
+	        Review.getAll().then(
 				function(success) {
-        	        $scope.reviews = success.data;
+        	        $scope.setAllReviewsInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	} catch(ex) {
-    		MessageHandler.manageException(ex);
+    		$scope.manageException(ex);
     	}
     }
-    /**
-     * Refresh review
-     */
     $scope.refreshReview = function(customerCode, bookId) {
     	try {
-        	$scope.review = null;
+        	$scope.cleanReviewInScope();
 	        Review.get(customerCode, bookId).then(
 				function(success) {
-        	        $scope.review = success.data;
+        	        $scope.setOneReviewInScope(success.data);
             	}, 
-	            MessageHandler.manageError);
+	            $scope.manageError);
     	  } catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     }
 
-    /**
-     * Go to the reviews list page
-     */
+    // location
+
     $scope.goToReviewList = function() {
         $scope.refreshReviewList();
         $location.path('/review');
     }
-    /**
-     * Go to the review edit page
-     */
     $scope.goToReview = function(customerCode, bookId) {
         $scope.refreshReview(customerCode, bookId);
         $location.path('/review/'+customerCode+'/'+bookId);
@@ -96,12 +135,9 @@ reviewModule.controller('ReviewCtrl', ['Review', '$scope', '$routeParams', '$htt
 
     // Actions
 
-    /**
-     * Save review
-     */
     $scope.save = function() {
     	try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Review.create;
@@ -110,44 +146,39 @@ reviewModule.controller('ReviewCtrl', ['Review', '$scope', '$routeParams', '$htt
 			}
 			save($scope.review).then(
     	        function(success) {
-	                MessageHandler.addSuccess('save ok');
-                	$scope.review = success.data;
+	                $scope.addSuccess('save ok');
+                	$scope.setOneReviewInScope(success.data);
             	},
-        	    MessageHandler.manageError);
+        	    $scope.manageError);
     	} catch(ex) {
-        	MessageHandler.manageException(ex);
+        	$scope.manageException(ex);
     	}
     };
-    /**
-     * Delete review
-     */
     $scope.delete = function(customerCode, bookId) {
 	    try {
-			MessageHandler.cleanMessage();
+			$scope.cleanMessage();
     	    Review.delete(customerCode, bookId).then(
 				function(success) {
                 	$scope.goToReviewList();
             	}, 
-                MessageHandler.manageError);
+                $scope.manageError);
         } catch(ex) {
-            MessageHandler.manageException(ex);
+            $scope.manageException(ex);
         }
     };
     
     // Main
-	MessageHandler.cleanMessage();
+
+	$scope.cleanMessage();
+    
     if( $location.path().endsWith('/new') ) {
-        // Creation page
-        $scope.review = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.customerCode != null && $routeParams.bookId != null ) {
-        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshReview($routeParams.customerCode, $routeParams.bookId);
     } else {
-        // List page
         $scope.refreshReviewList();
     }
     
