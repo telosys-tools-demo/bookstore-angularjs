@@ -3,4 +3,3 @@ logs/*
 node_modules/
 tmp
 .DS_Store
-/app/nbproject/private/
