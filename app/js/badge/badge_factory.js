@@ -1,44 +1,77 @@
 'use strict';
 
-/* Factory for Badge */
+/**
+ * Factory for Badge
+ */
+badgeModule.factory('Badge', ['$http', function($http) {
 
-myAppServices.factory('Badge', ['$http', function($http) {
+	// REST Service URL to manage badge
     var entityURL = baseURL + '/badge';
-    var $this = {};
-    $this.getAll = function() {
-        return $http.get(entityURL);
-    };
-    $this.get = function(badgeNumber) {
-        var url = entityURL + '/' + badgeNumber;
-        return $http.get(url);
-    };
-	$this.create = function(badge) {
-		$this.validate(badge)
-		var url = entityURL;
-		return $http.post(url, badge);
-    };
-    $this.update = function(badge) {
-		$this.validate(badge)
-		var url = entityURL + '/' + badge.badgeNumber;
-		return $http.put(url, badge);
-    };
-    $this.delete = function(badgeNumber) {
-        var url = entityURL + '/' + badgeNumber;
-        return $http.delete(url);
-    };
-    $this.validate = function(badge) {
-        var validationErrors = $this.getValidationErrors(badge);
-		if( validationErrors.length > 0 ) {
-			throw validationErrors;
-		}
-		return true;
-    };
-	$this.getValidationErrors = function(badge) {
+	
+	/**
+     * Validate badge
+     * @param badge badge
+     * @throws validation exception
+     */
+	var validate = function (badge) {
 		var errors = [];
         if( badge.badgeNumber == null || badge.badgeNumber == '' ) {
-			errors.push('badgeNumber is not defined');
+			errors.push('badge.id.not.defined');
 		}
-		return errors;
+		if(errors.length > 0) {
+			throw errors;
+		}
+    };
+	
+	return {
+        /**
+         * Get all badges
+         * @return all badges
+         */
+    	getAll: function() {
+        	return $http.get(entityURL);
+    	},
+
+        /**
+         * Get badge
+         * @param badgeNumber badgeNumber
+         * @return badge
+         */
+    	get: function(badgeNumber) {
+    	    var url = entityURL + '/' + badgeNumber;
+        	return $http.get(url);
+    	},
+
+        /**
+         * Create a new badge
+         * @param badge badge
+         * @return badge saved
+         */
+		create: function(badge) {
+			validate(badge)
+			var url = entityURL;
+			return $http.post(url, badge);
+    	},
+
+        /**
+         * Update badge
+         * @param badge badge
+         * @return badge saved
+         */
+    	update: function(badge) {
+			validate(badge)
+			var url = entityURL + '/' + badge.badgeNumber;
+			return $http.put(url, badge);
+    	},
+
+		/**
+         * Delete badge
+         * @param badgeNumber badgeNumber
+         */
+    	delete: function(badgeNumber) {
+        	var url = entityURL + '/' + badgeNumber;
+        	return $http.delete(url);
+    	}
 	};
 	return $this;
 }]);

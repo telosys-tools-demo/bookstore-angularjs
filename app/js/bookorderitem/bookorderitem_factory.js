@@ -1,47 +1,82 @@
 'use strict';
 
-/* Factory for BookOrderItem */
+/**
+ * Factory for BookOrderItem
+ */
+bookOrderItemModule.factory('BookOrderItem', ['$http', function($http) {
 
-myAppServices.factory('BookOrderItem', ['$http', function($http) {
+	// REST Service URL to manage bookOrderItem
     var entityURL = baseURL + '/bookOrderItem';
-    var $this = {};
-    $this.getAll = function() {
-        return $http.get(entityURL);
-    };
-    $this.get = function(bookOrderId, bookId) {
-        var url = entityURL + '/' + bookOrderId + '/' + bookId;
-        return $http.get(url);
-    };
-	$this.create = function(bookOrderItem) {
-		$this.validate(bookOrderItem)
-		var url = entityURL;
-		return $http.post(url, bookOrderItem);
-    };
-    $this.update = function(bookOrderItem) {
-		$this.validate(bookOrderItem)
-		var url = entityURL + '/' + bookOrderItem.bookOrderId + '/' + bookOrderItem.bookId;
-		return $http.put(url, bookOrderItem);
-    };
-    $this.delete = function(bookOrderId, bookId) {
-        var url = entityURL + '/' + bookOrderId + '/' + bookId;
-        return $http.delete(url);
-    };
-    $this.validate = function(bookOrderItem) {
-        var validationErrors = $this.getValidationErrors(bookOrderItem);
-		if( validationErrors.length > 0 ) {
-			throw validationErrors;
-		}
-		return true;
-    };
-	$this.getValidationErrors = function(bookOrderItem) {
+	
+	/**
+     * Validate bookOrderItem
+     * @param bookOrderItem bookOrderItem
+     * @throws validation exception
+     */
+	var validate = function (bookOrderItem) {
 		var errors = [];
         if( bookOrderItem.bookOrderId == null || bookOrderItem.bookOrderId == '' ) {
-			errors.push('bookOrderId is not defined');
+			errors.push('bookOrderItem.id.not.defined');
 		}
         if( bookOrderItem.bookId == null || bookOrderItem.bookId == '' ) {
-			errors.push('bookId is not defined');
+			errors.push('bookOrderItem.id.not.defined');
 		}
-		return errors;
+		if(errors.length > 0) {
+			throw errors;
+		}
+    };
+	
+	return {
+        /**
+         * Get all bookOrderItems
+         * @return all bookOrderItems
+         */
+    	getAll: function() {
+        	return $http.get(entityURL);
+    	},
+
+        /**
+         * Get bookOrderItem
+         * @param bookOrderId bookOrderId
+         * @param bookId bookId
+         * @return bookOrderItem
+         */
+    	get: function(bookOrderId, bookId) {
+    	    var url = entityURL + '/' + bookOrderId + '/' + bookId;
+        	return $http.get(url);
+    	},
+
+        /**
+         * Create a new bookOrderItem
+         * @param bookOrderItem bookOrderItem
+         * @return bookOrderItem saved
+         */
+		create: function(bookOrderItem) {
+			validate(bookOrderItem)
+			var url = entityURL;
+			return $http.post(url, bookOrderItem);
+    	},
+
+        /**
+         * Update bookOrderItem
+         * @param bookOrderItem bookOrderItem
+         * @return bookOrderItem saved
+         */
+    	update: function(bookOrderItem) {
+			validate(bookOrderItem)
+			var url = entityURL + '/' + bookOrderItem.bookOrderId + '/' + bookOrderItem.bookId;
+			return $http.put(url, bookOrderItem);
+    	},
+
+		/**
+         * Delete bookOrderItem
+         * @param bookOrderId bookOrderId
+         * @param bookId bookId
+         */
+    	delete: function(bookOrderId, bookId) {
+        	var url = entityURL + '/' + bookOrderId + '/' + bookId;
+        	return $http.delete(url);
+    	}
 	};
 	return $this;
 }]);

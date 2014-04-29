@@ -1,115 +1,68 @@
 'use strict';
 
-/* Controller for Author */
-
-myAppControllers.controller('AuthorCtrl', ['Author', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Author, $scope, $routeParams, $http, $location, $cookies) {
+/**
+ * Controller for Author
+ **/
+authorModule.controller('AuthorCtrl', ['Author', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', function(Author, $scope, $routeParams, $http, $location, $cookies, MessageHandler) {
 	
-    // mode
-
+    // edition mode
     $scope.mode = null;
     
-	// data
-
-    $scope.authors = {list: []};
+	// list of authors
+    $scope.authors = [];
+	// author to edit
     $scope.author = null;
 
 	// referencies entities
-
 	$scope.items = {};
-	
+
+    /**
+     * Load all referencies entities
+     */
 	$scope.loadAllReferencies = function() {
     };
     
-    // message
-
-	$scope.message = {};
-    $scope.message.successs = [];
-    $scope.message.errors = [];
-	$scope.cleanMessage = function() {
-        $scope.message.successs = [];
-        $scope.message.errors = [];
-    };
-    $scope.addSuccess = function(success) {
-        $scope.message.successs.push(success);
-    };
-    $scope.addError = function(error) {
-        $scope.message.errors.push(error);
-    };
-	$scope.manageError = function(http) {
-		if( http.status === 404 ) {
-			if( http.data == null || http.data === "" ) {
-				$scope.addError('The server is not responding');
-			} else {
-				$scope.addError('Invalid URL : ' + http.config.url);
-			}
-		} else if( http.status === 400 ) {
-			if(http.data == null) {
-				$scope.addError('Bad URL : ' + http.config.url);
-			} else {
-				$scope.addError(http.data);
-			}
-		} else {
-        	if( http.data != null && http.data !== "" ) {
-            	$scope.addError(http.data);
-        	}
-		}
-    };
-	$scope.manageException = function(error) {
-		$scope.addError(error);
-    };
-
-	// display data
-
-	
-    $scope.cleanAuthorsInScope = function() {
-        $scope.authors.list = [];
-    };
-    $scope.cleanAuthorInScope = function() {
-        $scope.author = null;
-    };
-    $scope.setAllAuthorsInScope = function(authors) {
-        $scope.authors.list = authors;
-    };
-    $scope.addAuthorInScope = function(author) {
-        $scope.authors.list.push(author);
-    };
-    $scope.setOneAuthorInScope = function(author) {
-        $scope.author = author;
-    };
-    
-    // refresh data
-
+    /**
+     * Refresh authors list
+     */
     $scope.refreshAuthorList = function() {
     	try {
-        	$scope.cleanAuthorsInScope();
-	        Author.getAll().then(
+			$scope.authors = [];
+        	Author.getAll().then(
 				function(success) {
-        	        $scope.setAllAuthorsInScope(success.data);
+        	        $scope.authors = success.data;
             	}, 
-	            $scope.manageError);
+	            MessageHandler.manageError);
     	} catch(ex) {
-    		$scope.manageException(ex);
+    		MessageHandler.manageException(ex);
     	}
     }
+    /**
+     * Refresh author
+     */
     $scope.refreshAuthor = function(id) {
     	try {
-        	$scope.cleanAuthorInScope();
+        	$scope.author = null;
 	        Author.get(id).then(
 				function(success) {
-        	        $scope.setOneAuthorInScope(success.data);
+        	        $scope.author = success.data;
             	}, 
-	            $scope.manageError);
+	            MessageHandler.manageError);
     	  } catch(ex) {
-        	$scope.manageException(ex);
+        	MessageHandler.manageException(ex);
     	}
     }
 
-    // location
-
+    /**
+     * Go to the authors list page
+     */
     $scope.goToAuthorList = function() {
         $scope.refreshAuthorList();
         $location.path('/author');
     }
+    /**
+     * Go to the author edit page
+     */
     $scope.goToAuthor = function(id) {
         $scope.refreshAuthor(id);
         $location.path('/author/'+id);
@@ -117,9 +70,12 @@ myAppControllers.controller('AuthorCtrl', ['Author', '$scope', '$routeParams', '
 
     // Actions
 
+    /**
+     * Save author
+     */
     $scope.save = function() {
     	try {
-			$scope.cleanMessage();
+			MessageHandler.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Author.create;
@@ -128,39 +84,44 @@ myAppControllers.controller('AuthorCtrl', ['Author', '$scope', '$routeParams', '
 			}
 			save($scope.author).then(
     	        function(success) {
-	                $scope.addSuccess('save ok');
-                	$scope.setOneAuthorInScope(success.data);
+	                MessageHandler.addSuccess('save ok');
+                	$scope.author = success.data;
             	},
-        	    $scope.manageError);
+        	    MessageHandler.manageError);
     	} catch(ex) {
-        	$scope.manageException(ex);
+        	MessageHandler.manageException(ex);
     	}
     };
+    /**
+     * Delete author
+     */
     $scope.delete = function(id) {
 	    try {
-			$scope.cleanMessage();
+			MessageHandler.cleanMessage();
     	    Author.delete(id).then(
 				function(success) {
                 	$scope.goToAuthorList();
             	}, 
-                $scope.manageError);
+                MessageHandler.manageError);
         } catch(ex) {
-            $scope.manageException(ex);
+            MessageHandler.manageException(ex);
         }
     };
     
     // Main
-
-	$scope.cleanMessage();
-    
+	MessageHandler.cleanMessage();
     if( $location.path().endsWith('/new') ) {
+        // Creation page
+        $scope.author = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.id != null ) {
+        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshAuthor($routeParams.id);
     } else {
+        // List page
         $scope.refreshAuthorList();
     }
     

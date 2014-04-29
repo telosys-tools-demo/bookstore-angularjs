@@ -1,4 +1,5 @@
-/build
-/.settings
-/.classpath
-/.project
+logs/*
+!.gitkeep
+node_modules/
+tmp
+.DS_Store

@@ -1,44 +1,77 @@
 'use strict';
 
-/* Factory for Customer */
+/**
+ * Factory for Customer
+ */
+customerModule.factory('Customer', ['$http', function($http) {
 
-myAppServices.factory('Customer', ['$http', function($http) {
+	// REST Service URL to manage customer
     var entityURL = baseURL + '/customer';
-    var $this = {};
-    $this.getAll = function() {
-        return $http.get(entityURL);
-    };
-    $this.get = function(code) {
-        var url = entityURL + '/' + code;
-        return $http.get(url);
-    };
-	$this.create = function(customer) {
-		$this.validate(customer)
-		var url = entityURL;
-		return $http.post(url, customer);
-    };
-    $this.update = function(customer) {
-		$this.validate(customer)
-		var url = entityURL + '/' + customer.code;
-		return $http.put(url, customer);
-    };
-    $this.delete = function(code) {
-        var url = entityURL + '/' + code;
-        return $http.delete(url);
-    };
-    $this.validate = function(customer) {
-        var validationErrors = $this.getValidationErrors(customer);
-		if( validationErrors.length > 0 ) {
-			throw validationErrors;
-		}
-		return true;
-    };
-	$this.getValidationErrors = function(customer) {
+	
+	/**
+     * Validate customer
+     * @param customer customer
+     * @throws validation exception
+     */
+	var validate = function (customer) {
 		var errors = [];
         if( customer.code == null || customer.code == '' ) {
-			errors.push('code is not defined');
+			errors.push('customer.id.not.defined');
 		}
-		return errors;
+		if(errors.length > 0) {
+			throw errors;
+		}
+    };
+	
+	return {
+        /**
+         * Get all customers
+         * @return all customers
+         */
+    	getAll: function() {
+        	return $http.get(entityURL);
+    	},
+
+        /**
+         * Get customer
+         * @param code code
+         * @return customer
+         */
+    	get: function(code) {
+    	    var url = entityURL + '/' + code;
+        	return $http.get(url);
+    	},
+
+        /**
+         * Create a new customer
+         * @param customer customer
+         * @return customer saved
+         */
+		create: function(customer) {
+			validate(customer)
+			var url = entityURL;
+			return $http.post(url, customer);
+    	},
+
+        /**
+         * Update customer
+         * @param customer customer
+         * @return customer saved
+         */
+    	update: function(customer) {
+			validate(customer)
+			var url = entityURL + '/' + customer.code;
+			return $http.put(url, customer);
+    	},
+
+		/**
+         * Delete customer
+         * @param code code
+         */
+    	delete: function(code) {
+        	var url = entityURL + '/' + code;
+        	return $http.delete(url);
+    	}
 	};
 	return $this;
 }]);

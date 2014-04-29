@@ -1,44 +1,77 @@
 'use strict';
 
-/* Factory for Workgroup */
+/**
+ * Factory for Workgroup
+ */
+workgroupModule.factory('Workgroup', ['$http', function($http) {
 
-myAppServices.factory('Workgroup', ['$http', function($http) {
+	// REST Service URL to manage workgroup
     var entityURL = baseURL + '/workgroup';
-    var $this = {};
-    $this.getAll = function() {
-        return $http.get(entityURL);
-    };
-    $this.get = function(id) {
-        var url = entityURL + '/' + id;
-        return $http.get(url);
-    };
-	$this.create = function(workgroup) {
-		$this.validate(workgroup)
-		var url = entityURL;
-		return $http.post(url, workgroup);
-    };
-    $this.update = function(workgroup) {
-		$this.validate(workgroup)
-		var url = entityURL + '/' + workgroup.id;
-		return $http.put(url, workgroup);
-    };
-    $this.delete = function(id) {
-        var url = entityURL + '/' + id;
-        return $http.delete(url);
-    };
-    $this.validate = function(workgroup) {
-        var validationErrors = $this.getValidationErrors(workgroup);
-		if( validationErrors.length > 0 ) {
-			throw validationErrors;
-		}
-		return true;
-    };
-	$this.getValidationErrors = function(workgroup) {
+	
+	/**
+     * Validate workgroup
+     * @param workgroup workgroup
+     * @throws validation exception
+     */
+	var validate = function (workgroup) {
 		var errors = [];
         if( workgroup.id == null || workgroup.id == '' ) {
-			errors.push('id is not defined');
+			errors.push('workgroup.id.not.defined');
 		}
-		return errors;
+		if(errors.length > 0) {
+			throw errors;
+		}
+    };
+	
+	return {
+        /**
+         * Get all workgroups
+         * @return all workgroups
+         */
+    	getAll: function() {
+        	return $http.get(entityURL);
+    	},
+
+        /**
+         * Get workgroup
+         * @param id id
+         * @return workgroup
+         */
+    	get: function(id) {
+    	    var url = entityURL + '/' + id;
+        	return $http.get(url);
+    	},
+
+        /**
+         * Create a new workgroup
+         * @param workgroup workgroup
+         * @return workgroup saved
+         */
+		create: function(workgroup) {
+			validate(workgroup)
+			var url = entityURL;
+			return $http.post(url, workgroup);
+    	},
+
+        /**
+         * Update workgroup
+         * @param workgroup workgroup
+         * @return workgroup saved
+         */
+    	update: function(workgroup) {
+			validate(workgroup)
+			var url = entityURL + '/' + workgroup.id;
+			return $http.put(url, workgroup);
+    	},
+
+		/**
+         * Delete workgroup
+         * @param id id
+         */
+    	delete: function(id) {
+        	var url = entityURL + '/' + id;
+        	return $http.delete(url);
+    	}
 	};
 	return $this;
 }]);

@@ -1,12 +1,7 @@
 		<fieldset class="col-sm-12 bordure">
 			<legend class="legende">{{ 'Book' | translate }}</legend>
 		
-			<div ng-repeat="success in message.successs" ng-show="message.successs.length > 0" class="alert alert-success">
-       			{{ success | translate }}
-			</div>
-			<div ng-repeat="error in message.errors" ng-show="message.errors.length > 0" class="alert alert-danger">
-       			{{error}}
-			</div>
+			<div ng-include src="'partials/message-include.html'"></div>
 			
 			<table class="table table-striped">
 				<thead>
@@ -23,7 +18,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="book in books.list">
+					<tr ng-repeat="book in books">
 						<td>{{book.id}}</td>
 						<td>{{book.isbn}}</td>
 						<td>{{book.title}}</td>
