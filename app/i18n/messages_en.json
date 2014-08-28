@@ -16,11 +16,13 @@
 	"author.id" : "id",
 	"author.firstName" : "firstName",
 	"author.lastName" : "lastName",
+	"author.id.not.defined" : "Author identifier is not defined",
 
 	"Badge" : "Badge",
 	"badge.badgeNumber" : "badgeNumber",
 	"badge.authorizationLevel" : "authorizationLevel",
 	"badge.endOfValidity" : "endOfValidity",
+	"badge.id.not.defined" : "Badge identifier is not defined",
 
 	"Book" : "Book",
 	"book.id" : "id",
@@ -28,11 +30,12 @@
 	"book.authorId" : "authorId",
 	"book.isbn" : "isbn",
 	"book.title" : "title",
-	"book.price" : "price",
 	"book.quantity" : "quantity",
 	"book.discount" : "discount",
 	"book.availability" : "availability",
 	"book.bestSeller" : "bestSeller",
+	"book.price" : "price",
+	"book.id.not.defined" : "Book identifier is not defined",
 
 	"BookOrder" : "BookOrder",
 	"bookOrder.id" : "id",
@@ -41,16 +44,19 @@
 	"bookOrder.employeeCode" : "employeeCode",
 	"bookOrder.date" : "date",
 	"bookOrder.state" : "state",
+	"bookOrder.id.not.defined" : "BookOrder identifier is not defined",
 
 	"BookOrderItem" : "BookOrderItem",
 	"bookOrderItem.bookOrderId" : "bookOrderId",
 	"bookOrderItem.bookId" : "bookId",
 	"bookOrderItem.quantity" : "quantity",
 	"bookOrderItem.price" : "price",
+	"bookOrderItem.id.not.defined" : "BookOrderItem identifier is not defined",
 
 	"Country" : "Country",
 	"country.code" : "code",
 	"country.name" : "name",
+	"country.id.not.defined" : "Country identifier is not defined",
 
 	"Customer" : "Customer",
 	"customer.code" : "code",
@@ -64,6 +70,7 @@
 	"customer.zipCode" : "zipCode",
 	"customer.phone" : "phone",
 	"customer.reviewer" : "reviewer",
+	"customer.id.not.defined" : "Customer identifier is not defined",
 
 	"Employee" : "Employee",
 	"employee.code" : "code",
@@ -73,10 +80,12 @@
 	"employee.manager" : "manager",
 	"employee.badgeNumber" : "badgeNumber",
 	"employee.email" : "email",
+	"employee.id.not.defined" : "Employee identifier is not defined",
 
 	"EmployeeGroup" : "EmployeeGroup",
 	"employeeGroup.employeeCode" : "employeeCode",
 	"employeeGroup.groupId" : "groupId",
+	"employeeGroup.id.not.defined" : "EmployeeGroup identifier is not defined",
 
 	"Publisher" : "Publisher",
 	"publisher.code" : "code",
@@ -87,6 +96,7 @@
 	"publisher.city" : "city",
 	"publisher.zipCode" : "zipCode",
 	"publisher.phone" : "phone",
+	"publisher.id.not.defined" : "Publisher identifier is not defined",
 
 	"Review" : "Review",
 	"review.customerCode" : "customerCode",
@@ -95,6 +105,7 @@
 	"review.reviewNote" : "reviewNote",
 	"review.creation" : "creation",
 	"review.lastUpdate" : "lastUpdate",
+	"review.id.not.defined" : "Review identifier is not defined",
 
 	"Shop" : "Shop",
 	"shop.code" : "code",
@@ -107,16 +118,23 @@
 	"shop.phone" : "phone",
 	"shop.email" : "email",
 	"shop.executive" : "executive",
+	"shop.id.not.defined" : "Shop identifier is not defined",
 
 	"Synopsis" : "Synopsis",
 	"synopsis.bookId" : "bookId",
 	"synopsis.synopsis" : "synopsis",
+	"synopsis.id.not.defined" : "Synopsis identifier is not defined",
 
 	"Workgroup" : "Workgroup",
 	"workgroup.id" : "id",
 	"workgroup.name" : "name",
 	"workgroup.description" : "description",
 	"workgroup.creationDate" : "creationDate",
+	"workgroup.id.not.defined" : "Workgroup identifier is not defined",
+	
+	"server.not.responding": "The server is not responding",
+	"url.invalid": "Invalid URL : {value}",
+	"url.bad": "Bad URL : {value}",
 
 	"app.version" : "Version"
 }

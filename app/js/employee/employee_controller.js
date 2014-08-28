@@ -1,142 +1,88 @@
 'use strict';
 
-/* Controller for Employee */
-
-myAppControllers.controller('EmployeeCtrl', ['Employee', '$scope', '$routeParams', '$http', '$location', '$cookies', function(Employee, $scope, $routeParams, $http, $location, $cookies) {
-	
-    // mode
-
+/**
+ * Controller for Employee
+ **/
+employeeModule.controller('EmployeeCtrl', ['Employee',  'Shop', 'Workgroup', 'Badge', '$scope', '$routeParams', '$http', '$location', '$cookies', 'MessageHandler', 'restURL', function(Employee, Shop, Workgroup, Badge, $scope, $routeParams, $http, $location, $cookies, MessageHandler, restURL) {
+	 'Shop',  'Workgroup',  'Badge',     // edition mode
     $scope.mode = null;
     
-	// data
-
-    $scope.employees = {list: []};
+	// list of employees
+    $scope.employees = [];
+	// employee to edit
     $scope.employee = null;
 
 	// referencies entities
-
 	$scope.items = {};
+    // shops
 	$scope.items.shops = [];
+    // workgroups
 	$scope.items.workgroups = [];
+    // badges
 	$scope.items.badges = [];
-	$scope.loadAllShop = function() {
-        $http({method: 'GET', url: baseURL + '/items/shop'}).
-        success(function(data, status, headers, config) {
-            $scope.items.shops = data;
-        }).
-        error($scope.manageError);
-    };
-	$scope.loadAllWorkgroup = function() {
-        $http({method: 'GET', url: baseURL + '/items/workgroup'}).
-        success(function(data, status, headers, config) {
-            $scope.items.workgroups = data;
-        }).
-        error($scope.manageError);
-    };
-	$scope.loadAllBadge = function() {
-        $http({method: 'GET', url: baseURL + '/items/badge'}).
-        success(function(data, status, headers, config) {
-            $scope.items.badges = data;
-        }).
-        error($scope.manageError);
-    };
-	
+
+    /**
+     * Load all referencies entities
+     */
 	$scope.loadAllReferencies = function() {
-		$scope.loadAllShop();
-		$scope.loadAllWorkgroup();
-		$scope.loadAllBadge();
+		Shop.getAllAsListItems().then(
+				function(success) {
+        	        $scope.items.shops = success.data;
+            	}, 
+	            MessageHandler.manageError);
+		Workgroup.getAllAsListItems().then(
+				function(success) {
+        	        $scope.items.workgroups = success.data;
+            	}, 
+	            MessageHandler.manageError);
+		Badge.getAllAsListItems().then(
+				function(success) {
+        	        $scope.items.badges = success.data;
+            	}, 
+	            MessageHandler.manageError);
     };
     
-    // message
-
-	$scope.message = {};
-    $scope.message.successs = [];
-    $scope.message.errors = [];
-	$scope.cleanMessage = function() {
-        $scope.message.successs = [];
-        $scope.message.errors = [];
-    };
-    $scope.addSuccess = function(success) {
-        $scope.message.successs.push(success);
-    };
-    $scope.addError = function(error) {
-        $scope.message.errors.push(error);
-    };
-	$scope.manageError = function(http) {
-		if( http.status === 404 ) {
-			if( http.data == null || http.data === "" ) {
-				$scope.addError('The server is not responding');
-			} else {
-				$scope.addError('Invalid URL : ' + http.config.url);
-			}
-		} else if( http.status === 400 ) {
-			if(http.data == null) {
-				$scope.addError('Bad URL : ' + http.config.url);
-			} else {
-				$scope.addError(http.data);
-			}
-		} else {
-        	if( http.data != null && http.data !== "" ) {
-            	$scope.addError(http.data);
-        	}
-		}
-    };
-	$scope.manageException = function(error) {
-		$scope.addError(error);
-    };
-
-	// display data
-
-	
-    $scope.cleanEmployeesInScope = function() {
-        $scope.employees.list = [];
-    };
-    $scope.cleanEmployeeInScope = function() {
-        $scope.employee = null;
-    };
-    $scope.setAllEmployeesInScope = function(employees) {
-        $scope.employees.list = employees;
-    };
-    $scope.addEmployeeInScope = function(employee) {
-        $scope.employees.list.push(employee);
-    };
-    $scope.setOneEmployeeInScope = function(employee) {
-        $scope.employee = employee;
-    };
-    
-    // refresh data
-
+    /**
+     * Refresh employees list
+     */
     $scope.refreshEmployeeList = function() {
     	try {
-        	$scope.cleanEmployeesInScope();
-	        Employee.getAll().then(
+			$scope.employees = [];
+        	Employee.getAll().then(
 				function(success) {
-        	        $scope.setAllEmployeesInScope(success.data);
+        	        $scope.employees = success.data;
             	}, 
-	            $scope.manageError);
+	            MessageHandler.manageError);
     	} catch(ex) {
-    		$scope.manageException(ex);
+    		MessageHandler.manageException(ex);
     	}
     }
+    /**
+     * Refresh employee
+     */
     $scope.refreshEmployee = function(code) {
     	try {
-        	$scope.cleanEmployeeInScope();
+        	$scope.employee = null;
 	        Employee.get(code).then(
 				function(success) {
-        	        $scope.setOneEmployeeInScope(success.data);
+        	        $scope.employee = success.data;
             	}, 
-	            $scope.manageError);
+	            MessageHandler.manageError);
     	  } catch(ex) {
-        	$scope.manageException(ex);
+        	MessageHandler.manageException(ex);
     	}
     }
 
-    // location
-
+    /**
+     * Go to the employees list page
+     */
     $scope.goToEmployeeList = function() {
         $scope.refreshEmployeeList();
         $location.path('/employee');
     }
+    /**
+     * Go to the employee edit page
+     */
     $scope.goToEmployee = function(code) {
         $scope.refreshEmployee(code);
         $location.path('/employee/'+code);
@@ -144,9 +90,12 @@ myAppControllers.controller('EmployeeCtrl', ['Employee', '$scope', '$routeParams
 
     // Actions
 
+    /**
+     * Save employee
+     */
     $scope.save = function() {
     	try {
-			$scope.cleanMessage();
+			MessageHandler.cleanMessage();
 			var save;
 			if( $scope.mode === 'create' ) {
         		save = Employee.create;
@@ -155,39 +104,44 @@ myAppControllers.controller('EmployeeCtrl', ['Employee', '$scope', '$routeParams
 			}
 			save($scope.employee).then(
     	        function(success) {
-	                $scope.addSuccess('save ok');
-                	$scope.setOneEmployeeInScope(success.data);
+	                MessageHandler.addSuccess('save ok');
+                	$scope.employee = success.data;
             	},
-        	    $scope.manageError);
+        	    MessageHandler.manageError);
     	} catch(ex) {
-        	$scope.manageException(ex);
+        	MessageHandler.manageException(ex);
     	}
     };
+    /**
+     * Delete employee
+     */
     $scope.delete = function(code) {
 	    try {
-			$scope.cleanMessage();
+			MessageHandler.cleanMessage();
     	    Employee.delete(code).then(
 				function(success) {
                 	$scope.goToEmployeeList();
             	}, 
-                $scope.manageError);
+                MessageHandler.manageError);
         } catch(ex) {
-            $scope.manageException(ex);
+            MessageHandler.manageException(ex);
         }
     };
     
     // Main
-
-	$scope.cleanMessage();
-    
+	MessageHandler.cleanMessage();
     if( $location.path().endsWith('/new') ) {
+        // Creation page
+        $scope.employee = {};
         $scope.mode = 'create';
 		$scope.loadAllReferencies();
         $scope.bookorderitem = null;
     } else if( $routeParams.code != null ) {
+        // Edit page
 		$scope.loadAllReferencies();
 		$scope.refreshEmployee($routeParams.code);
     } else {
+        // List page
         $scope.refreshEmployeeList();
     }
     

@@ -1,44 +1,85 @@
 'use strict';
 
-/* Factory for Publisher */
+/**
+ * Factory for Publisher
+ */
+publisherModule.factory('Publisher', ['$http', 'restURL', function($http, restURL) {
 
-myAppServices.factory('Publisher', ['$http', function($http) {
-    var entityURL = baseURL + '/publisher';
-    var $this = {};
-    $this.getAll = function() {
-        return $http.get(entityURL);
-    };
-    $this.get = function(code) {
-        var url = entityURL + '/' + code;
-        return $http.get(url);
-    };
-	$this.create = function(publisher) {
-		$this.validate(publisher)
-		var url = entityURL;
-		return $http.post(url, publisher);
-    };
-    $this.update = function(publisher) {
-		$this.validate(publisher)
-		var url = entityURL + '/' + publisher.code;
-		return $http.put(url, publisher);
-    };
-    $this.delete = function(code) {
-        var url = entityURL + '/' + code;
-        return $http.delete(url);
-    };
-    $this.validate = function(publisher) {
-        var validationErrors = $this.getValidationErrors(publisher);
-		if( validationErrors.length > 0 ) {
-			throw validationErrors;
-		}
-		return true;
-    };
-	$this.getValidationErrors = function(publisher) {
+	// REST Service URL to manage publisher
+    var entityURL = restURL + '/publisher';
+	
+	/**
+     * Validate publisher
+     * @param publisher publisher
+     * @throws validation exception
+     */
+	var validate = function (publisher) {
 		var errors = [];
         if( publisher.code == null || publisher.code == '' ) {
-			errors.push('code is not defined');
+			errors.push('publisher.id.not.defined');
 		}
-		return errors;
+		if(errors.length > 0) {
+			throw errors;
+		}
+    };
+	
+	return {
+        /**
+         * Get all publishers as list items
+         * @return all publishers as list items
+         */
+    	getAllAsListItems: function() {
+        	return $http.get(restURL + '/items/publisher');
+    	},
+
+        /**
+         * Get all publishers
+         * @return all publishers
+         */
+    	getAll: function() {
+        	return $http.get(entityURL);
+    	},
+
+        /**
+         * Get publisher
+         * @param code code
+         * @return publisher
+         */
+    	get: function(code) {
+    	    var url = entityURL + '/' + code;
+        	return $http.get(url);
+    	},
+
+        /**
+         * Create a new publisher
+         * @param publisher publisher
+         * @return publisher saved
+         */
+		create: function(publisher) {
+			validate(publisher)
+			var url = entityURL;
+			return $http.post(url, publisher);
+    	},
+
+        /**
+         * Update publisher
+         * @param publisher publisher
+         * @return publisher saved
+         */
+    	update: function(publisher) {
+			validate(publisher)
+			var url = entityURL + '/' + publisher.code;
+			return $http.put(url, publisher);
+    	},
+
+		/**
+         * Delete publisher
+         * @param code code
+         */
+    	delete: function(code) {
+        	var url = entityURL + '/' + code;
+        	return $http.delete(url);
+    	}
 	};
 	return $this;
 }]);
